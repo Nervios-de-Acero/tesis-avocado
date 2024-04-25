@@ -1,9 +1,11 @@
-const express = require('express')
-const router = express.Router()
-const db = require('../conection')
-const bcrypt = require('bcrypt')
-const { checkSchema, validationResult } = require('express-validator')
-const validaciones = require('../utils/validacionesLogin')
+const express = require('express');
+const router = express.Router();
+const { checkSchema, validationResult } = require('express-validator');
+const validaciones = require('../utils/validacionesLogin');
+const { login } = require('../controllers/loginController');
+
+// Validaciones de inicio de sesión
+router.post('/', checkSchema(validaciones), login);
 
 /* router.get('/test', async function(req, res){
   try {
