@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt')
 const { checkSchema, validationResult } = require('express-validator')
 const validaciones = require('../utils/validacionesLogin')
 
-router.get('/test', async function(req, res){
+/* router.get('/test', async function(req, res){
   try {
     const results = await db.promise().query('SELECT mensaje FROM test');
     console.log(results)
@@ -73,8 +73,6 @@ router.post('/hash', (req, res) => {
     pass: req.body.contraseña,
     hash
   })
-})
-
-
+}) */
 
 module.exports = router
