@@ -3,7 +3,7 @@ const funciones = {};
 //#region Funciones
 
 /**
- *
+ * Funcion encargada de manejar las respuestas de las peticiones y devolverlas al Front.
  * @param {object} res
  * @param {object} datos
  * @return {undefined}
