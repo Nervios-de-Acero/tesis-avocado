@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { checkSchema, validationResult } = require('express-validator');
+const { checkSchema } = require('express-validator');
 const validaciones = require('../utils/validacionesLogin');
 const { login } = require('../controllers/loginController');
 
-// Validaciones de inicio de sesión
+// Iniciar sesión
 router.post('/', checkSchema(validaciones), login);
+
+module.exports = router;
+
 
 /* router.get('/test', async function(req, res){
   try {
@@ -75,6 +78,4 @@ router.post('/hash', (req, res) => {
     pass: req.body.contraseña,
     hash
   })
-}) */
-
-module.exports = router
+})  */
