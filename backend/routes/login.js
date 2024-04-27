@@ -1,5 +1,32 @@
 const express = require('express');
 const router = express.Router();
+const funcionesComunes = require('../utils/funcionesComunes');
+const { checkSchema } = require('express-validator');
+const validaciones = require('../utils/validacionesLogin');
+const { login } = require('../controllers/loginController');
+
+// Iniciar sesión
+router.post('/', checkSchema(validaciones), async (req, res) => {
+  try {
+    await login(req, res);
+  } catch (error) {
+    console.error('Error en el inicio de sesión:', error);
+    funcionesComunes.manejoRespuestas(res, {
+      errors: {
+        message: 'Error interno del servidor al iniciar sesión'
+      },
+      meta: {
+        status: 500
+      }
+    });
+  }
+});
+
+module.exports = router;
+
+
+/* const express = require('express');
+const router = express.Router();
 const { checkSchema } = require('express-validator');
 const validaciones = require('../utils/validacionesLogin');
 const { login } = require('../controllers/loginController');
@@ -7,7 +34,7 @@ const { login } = require('../controllers/loginController');
 // Iniciar sesión
 router.post('/', checkSchema(validaciones), login);
 
-module.exports = router;
+module.exports = router; */
 
 
 /* router.get('/test', async function(req, res){
