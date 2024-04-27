@@ -1,37 +1,34 @@
-const db = require('../conection');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
+const tokenFunctions = require('../utils/token');
 
-// Controlador para el inicio de sesión
-exports.login = (req, res) => {
-    if (Object.keys(req.body).length === 0 || typeof req.body.password === 'undefined' || typeof req.body.email === 'undefined') {
-        return res.status(400).json({ errors: [{ message: 'Bad request. Campos incorrectos' }] });
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const userData = await db.query(`SELECT * FROM usuarios WHERE email = ?`, [email]);
+    
+    if (userData.length === 0) {
+      return res.status(404).send({ message: 'El usuario no existe' });
     }
 
-    db.query(`CALL sp_iniciarSesion('${req.body.email}');`, function (error, results, fields) {
-        if (error) {
-            return res.status(500).json({ errors: [{ message: 'Error interno del servidor' }] });
-        }
+    const user = userData[0];
+    
+    const validPassword = await bcrypt.compare(password, user.password);
 
-        const response = results[0][0];
-        if (response.success) {
-            if (bcrypt.compareSync(req.body.password, response.result)) {
-                const token = jwt.sign({ email: req.body.email }, 'secret_key', { expiresIn: '1h' });
-                return res.status(200).json({
-                    data: {
-                        id: '1', // Puedes proporcionar un id único para el usuario
-                        type: 'users',
-                        attributes: {
-                            email: req.body.email,
-                            token: token
-                        }
-                    }
-                });
-            } else {
-                return res.status(401).json({ errors: [{ message: 'Contraseña incorrecta' }] });
-            }
-        } else {
-            return res.status(404).json({ errors: [{ message: 'El usuario no existe' }] });
-        }
-    });
+    if (!validPassword) {
+      return res.status(401).send({ message: 'Usuario o contraseña incorrectos' });
+    }
+
+    // Generar el token JWT
+    const token = tokenFunctions.generateToken({ userId: user.id });
+
+    // Enviar el token JWT en la respuesta
+    res.status(200).send({ message: 'Sesión iniciada', token });
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error);
+    res.status(500).send({ message: 'Error del servidor, contáctese con el administrador' });
+  }
 };
+
+module.exports = { login };
