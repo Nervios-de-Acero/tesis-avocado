@@ -42,7 +42,6 @@ controller.getRecetasUsuario = (req, res) => {
                         status: 400,
                     },
                 });
-                return;
             } else if (results[0]) {
                 funcionesComunes.manejoRespuestas(res, {
                     //Debe llevar la propiedad data si NO es un error
@@ -54,7 +53,6 @@ controller.getRecetasUsuario = (req, res) => {
                         status: 200,
                     },
                 });
-                return;
             } else {
                 funcionesComunes.manejoRespuestas(res, {
                     data: {
@@ -65,7 +63,6 @@ controller.getRecetasUsuario = (req, res) => {
                         status: 204,
                     },
                 });
-                return;
             }
         });
         //En el catch hacemos una respuesta de error si hay un error de la DB
@@ -80,6 +77,7 @@ controller.getRecetasUsuario = (req, res) => {
             },
         });
     }
+    return;
 };
 
 //#endregion
