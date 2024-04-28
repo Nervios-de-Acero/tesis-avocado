@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { checkSchema, validationResult } = require('express-validator');
 const validacion = require('../utils/validacionesRecetas');
-const funcionesComunes = require('../utils/funcionesComunes');
+const funcionesToken = require('../utils/token');
 
 //#region Controllers
 
@@ -296,7 +296,7 @@ router.get('/getRecetaById/:id', (req, res) => {
     });
 });
 
-router.get('/getRecetasUsuario/:email', recetaController.getRecetasUsuario);
+router.get('/getRecetasUsuario/:email', funcionesToken.validateToken, recetaController.getRecetasUsuario);
 
 router.delete('/eliminarReceta/:id', (req, res) => {
     const id = req.params.id;
