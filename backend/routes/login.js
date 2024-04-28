@@ -1,12 +1,31 @@
 const express = require('express');
 const router = express.Router();
 const funcionesComunes = require('../utils/funcionesComunes');
-const { checkSchema } = require('express-validator');
+const { checkSchema, validationResult } = require('express-validator');
 const validaciones = require('../utils/validacionesLogin');
 const { login } = require('../controllers/loginController');
 
 // Iniciar sesión
-router.post('/', checkSchema(validaciones), async (req, res) => {
+router.post('/', checkSchema(validaciones), (req, res) => {
+  const resValidaciones = validationResult(req).array();
+
+  if (resValidaciones.length > 0) {
+    res.send({
+      success: false,
+      message: 'Error al iniciar sesión. Campos inválidos',
+      content: resValidaciones
+    });
+    return;
+  }
+
+  login(req, res);
+});
+
+module.exports = router;
+
+
+
+/* router.post('/', checkSchema(validaciones), async (req, res) => {
   try {
     await login(req, res);
   } catch (error) {
@@ -22,7 +41,7 @@ router.post('/', checkSchema(validaciones), async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; */
 
 
 /* const express = require('express');
