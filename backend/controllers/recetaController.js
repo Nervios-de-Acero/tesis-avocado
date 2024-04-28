@@ -1,5 +1,6 @@
 const db = require('../conection');
 const funcionesComunes = require('../utils/funcionesComunes');
+const funcionesToken = require('../utils/token');
 
 const controller = {};
 
@@ -8,9 +9,20 @@ const controller = {};
 //Se agrega el controlador como propiedad del objeto "controller"
 //Necesita como minimo parametros req y res
 controller.getRecetasUsuario = (req, res) => {
-    //const token = req.headers.authorization;
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token);
 
-    //const email = funcionesComunes.funcionCOSOESO(token);
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
 
     //Importante el try/catch() en caso de suceder error en el db.query
     try {
@@ -30,6 +42,7 @@ controller.getRecetasUsuario = (req, res) => {
                         status: 400,
                     },
                 });
+                return;
             } else if (results[0]) {
                 funcionesComunes.manejoRespuestas(res, {
                     //Debe llevar la propiedad data si NO es un error
@@ -41,6 +54,7 @@ controller.getRecetasUsuario = (req, res) => {
                         status: 200,
                     },
                 });
+                return;
             } else {
                 funcionesComunes.manejoRespuestas(res, {
                     data: {
@@ -48,9 +62,10 @@ controller.getRecetasUsuario = (req, res) => {
                         content: [],
                     },
                     meta: {
-                        status: 201,
+                        status: 204,
                     },
                 });
+                return;
             }
         });
         //En el catch hacemos una respuesta de error si hay un error de la DB
