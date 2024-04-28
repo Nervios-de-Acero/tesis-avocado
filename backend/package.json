@@ -19,13 +19,16 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-jwt": "^8.4.1",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
     "method-override": "^3.0.0",
     "morgan": "^1.10.0",
     "mysql2": "^3.6.2",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "vercel": "^34.1.2"
   }
 }
