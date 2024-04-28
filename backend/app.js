@@ -22,6 +22,7 @@ const usuarioRouter = require('./routes/usuario')
 const loginRouter = require('./routes/login')
 const logoutRouter = require('./routes/logout')
 const registroRouter = require('./routes/registro')
+const testRouter = require('./routes/test');
 
 //conexión db
 const conexionDB = async () => {
@@ -109,6 +110,7 @@ app.use('/usuario', usuarioRouter)
 app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/registro', registroRouter)
+app.use('/test', testRouter);
 
 
 

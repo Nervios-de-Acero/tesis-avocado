@@ -1,11 +1,43 @@
-const express = require('express')
-const router = express.Router()
-const db = require('../conection')
-const bcrypt = require('bcrypt')
-const { checkSchema, validationResult } = require('express-validator')
-const validaciones = require('../utils/validacionesLogin')
+const express = require('express');
+const router = express.Router();
+const funcionesComunes = require('../utils/funcionesComunes');
+const { checkSchema } = require('express-validator');
+const validaciones = require('../utils/validacionesLogin');
+const { login } = require('../controllers/loginController');
 
-router.get('/test', async function(req, res){
+// Iniciar sesión
+router.post('/', checkSchema(validaciones), async (req, res) => {
+  try {
+    await login(req, res);
+  } catch (error) {
+    console.error('Error en el inicio de sesión:', error);
+    funcionesComunes.manejoRespuestas(res, {
+      errors: {
+        message: 'Error interno del servidor al iniciar sesión'
+      },
+      meta: {
+        status: 500
+      }
+    });
+  }
+});
+
+module.exports = router;
+
+
+/* const express = require('express');
+const router = express.Router();
+const { checkSchema } = require('express-validator');
+const validaciones = require('../utils/validacionesLogin');
+const { login } = require('../controllers/loginController');
+
+// Iniciar sesión
+router.post('/', checkSchema(validaciones), login);
+
+module.exports = router; */
+
+
+/* router.get('/test', async function(req, res){
   try {
     const results = await db.promise().query('SELECT mensaje FROM test');
     console.log(results)
@@ -73,8 +105,4 @@ router.post('/hash', (req, res) => {
     pass: req.body.contraseña,
     hash
   })
-})
-
-
-
-module.exports = router
+})  */
