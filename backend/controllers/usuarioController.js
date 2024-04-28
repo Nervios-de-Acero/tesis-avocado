@@ -29,7 +29,6 @@ controller.actualizarPerfil = (req, res) => {
     if (resValidaciones.length > 0) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
-                success: false,
                 message: 'Campos inválidos',
                 content: resValidaciones,
             },
