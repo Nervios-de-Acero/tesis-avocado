@@ -305,7 +305,7 @@ THEN
 ELSEIF tipo = 'categorias'
 THEN 
 	SELECT CONCAT('$[', i, ']') INTO el;
-	SET @dato = CAST(JSON_EXTRACT(categorias, el) AS SIGNED);
+	SET @dato = CAST(JSON_EXTRACT(arr, el) AS SIGNED);
 	INSERT INTO recetas_categorias (idReceta, idCategoria)
 	VALUES (idR, @dato);
 
@@ -317,3 +317,71 @@ END IF;
 SET i = i + 1;
 END WHILE;
 END //
+
+/********************************* NUEVO SP MODIFICAR RECETAS **********************************/
+DELIMITER //
+CREATE PROCEDURE "sp_actualizarReceta" (
+IN idR INT, 
+IN descripcionR TEXT, 
+IN tiempoCoccionR VARCHAR(20), 
+IN dificultadR VARCHAR(15),
+IN pasosR JSON,
+IN ingredientesR JSON,
+IN categoriasR JSON,
+IN imagenR TEXT
+)
+BEGIN 
+	IF idR IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45002'
+		SET MESSAGE_TEXT = 'Error: El id de la receta es obligatorio';
+	END IF;
+
+	IF (SELECT COUNT(idReceta) FROM recetas WHERE idReceta = idR ) = 0 
+	THEN 
+		SIGNAL SQLSTATE '45003'
+		SET MESSAGE_TEXT = 'Error: No se encontraron recetas';
+	END IF;
+    
+    IF NOT JSON_VALID(categoriasR) THEN 
+    SIGNAL SQLSTATE '45004'
+    SET MESSAGE_TEXT = 'Error: El valor de categoriasR no es un JSON válido';
+    END IF;
+
+	IF descripcionR IS NOT NULL
+		THEN UPDATE recetas SET descripcion = descripcionR WHERE idReceta = idR;
+ 	END IF;
+     
+ 	IF tiempoCoccionR IS NOT NULL
+ 		THEN UPDATE recetas SET tiempoCoccion = tiempoCoccionR WHERE idReceta = idR;
+ 	END IF;
+    
+ 	IF dificultadR IS NOT NULL
+ 		THEN UPDATE recetas SET dificultad = dificultadR WHERE idReceta = idR;
+ 	END IF;
+    
+	IF imagenR IS NOT NULL
+ 		THEN UPDATE recetas SET imagen = imagenR WHERE idReceta = idR;
+	END IF;
+    
+	IF categoriasR IS NOT NULL
+		THEN 
+			DELETE FROM recetas_categorias WHERE idReceta = idR;
+			CALL sp_crearPasoIngredienteCategoria(idR, categoriasR, 'categorias');
+	END IF;
+    
+    IF ingredientesR IS NOT NULL
+		THEN 
+ 			DELETE FROM ingredientes WHERE idReceta = idR;
+ 			CALL sp_crearPasoIngredienteCategoria(idR, ingredientesR, 'ingredientes');
+ 	END IF;
+     
+	IF pasosR IS NOT NULL
+		THEN 
+			DELETE FROM ingredientes WHERE idReceta = idR;
+ 			CALL sp_crearPasoIngredienteCategoria(idR, pasosR, 'pasos');
+ 	END IF;
+    
+	UPDATE recetas SET fechaActualizacion = NOW();
+END
+//
