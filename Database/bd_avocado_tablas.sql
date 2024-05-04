@@ -39,7 +39,6 @@ CONSTRAINT fk_receta FOREIGN KEY(idReceta) REFERENCES recetas(idReceta)
 CREATE TABLE pasos(
 idPaso INT PRIMARY KEY AUTO_INCREMENT,
 idReceta INT NOT NULL,
-titulo VARCHAR(20) NOT NULL,
 descripcion TEXT NOT NULL,
 CONSTRAINT fk_paso FOREIGN KEY(idReceta) REFERENCES recetas(idReceta)
 );

@@ -225,28 +225,39 @@ UPDATE recetas SET fechaActualizacion = NOW() WHERE idReceta = idR;
 END
 //
 
+/************************NUEVO SP CREAR RECETA***************************/
 DELIMITER //
-CREATE PROCEDURE `sp_crearReceta` (IN tituloR VARCHAR(250) , IN emailCreador VARCHAR(250), IN tiempoCoccionR VARCHAR(20), IN dificultadR VARCHAR(12), 
-IN descripcionR TEXT, IN imagenR BLOB, IN ingredientes JSON , IN pasos JSON, IN categorias JSON)
+CREATE PROCEDURE "sp_crearReceta"(IN emailCreador VARCHAR(250), IN tituloR VARCHAR(250) , IN tiempoCoccionR VARCHAR(20), IN dificultadR VARCHAR(12), 
+IN descripcionR TEXT, IN imagenR TEXT, IN ingredientes JSON , IN pasos JSON, IN categorias JSON)
 BEGIN
 	DECLARE idR INT;
 	DECLARE idUser INT;
 	SET idUSer = (SELECT idUsuario FROM usuarios WHERE email = emailCreador);
+    
+     IF emailCreador IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45006'
+		SET MESSAGE_TEXT = 'Error: Email obligatorio';
+	END IF;
+    
+    IF idUser IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45005'
+		SET MESSAGE_TEXT = 'Error: El usuario no existe';
+	END IF;
+    
 	IF idUser IS NOT NULL
 		THEN
 			INSERT INTO recetas (titulo, creadoPor, tiempoCoccion, dificultad, imagen, fechaCreacion, fechaActualizacion, descripcion)
 			VALUES (tituloR, idUser, tiempoCoccionR, dificultadR, imagenR, NOW(), NOW(), descripcionR);
 			SET idR = LAST_INSERT_ID();
-			CALL sp_crearIngrediente(idR, ingredientes);
-			CALL sp_crearPaso(idR, pasos);
+			CALL sp_crearPasoIngredienteCategoria(idR, ingredientes, 'ingredientes');
+			CALL sp_crearPasoIngredienteCategoria(idR, pasos, 'pasos');
 				IF categorias IS NOT NULL
-					THEN CALL sp_crearCategoria(idR, categorias);
+					THEN CALL sp_crearPasoIngredienteCategoria(idR, categorias, 'categorias');
 				END IF;
-		SELECT true AS success, 'Receta creada correctamente' AS message; 
-		ELSE SELECT false AS success, 'El usuario no existe' AS message;
 	END IF;
-END
-//
+END //
 
 
 DELIMITER //
@@ -263,7 +274,7 @@ BEGIN
 END
 //
 
-/********************************* NUEVO SP PARA PASOS, INGREDIENTES O CATEGORÍAS ****************************************/
+
 DELIMITER //
 CREATE PROCEDURE sp_crearPasoIngredienteCategoria (
 IN idR INT,
@@ -318,7 +329,7 @@ SET i = i + 1;
 END WHILE;
 END //
 
-/********************************* NUEVO SP MODIFICAR RECETAS **********************************/
+
 DELIMITER //
 CREATE PROCEDURE "sp_actualizarReceta" (
 IN idR INT, 
