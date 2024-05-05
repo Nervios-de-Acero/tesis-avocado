@@ -60,6 +60,13 @@ CONSTRAINT fk_catReceta FOREIGN KEY(idReceta) REFERENCES recetas(idReceta),
 CONSTRAINT fk_catCategoria FOREIGN KEY(idCategoria) REFERENCES categorias(idCategoria)
 );
 
+CREATE TABLE productos(
+idProducto INT PRIMARY KEY AUTO_INCREMENT,
+nombre VARCHAR(150) NOT NULL,
+cantPersonas INT NOT NULL,
+cantRecetas INT NOT NULL,
+precio INT NOT NULL
+);
 
 -- INSERTAR CATEGORIAS PARA LA TABLA CATEGORIAS
 INSERT INTO categorias (idCategoria, nombre) VALUES (1, 'Desayuno'), (2, 'Almuerzo'), (3, 'Cena'), (4, 'Entradas'), (5, 'Aperitivos'), (6, 'Snacks'), 
