@@ -82,4 +82,138 @@ controller.getRecetasUsuario = (req, res) => {
 
 //#endregion
 
+
+
+controller.agregarReceta = (req, res) => {
+    // Verificar el token
+    const token = req.headers.authorization;
+    if (!token) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Token de autenticación no proporcionado'
+            },
+            meta: {
+                status: 401
+            }
+        });
+        return;
+    }
+
+    try {
+        const decodedToken = tokenFunctions.verifyToken(token);
+        if (!decodedToken) {
+            funcionesComunes.manejoRespuestas(res, {
+                errors: {
+                    message: 'Token de autenticación inválido'
+                },
+                meta: {
+                    status: 401
+                }
+            });
+            return;
+        }
+
+        const db = require('../conection');
+const funcionesComunes = require('../utils/funcionesComunes');
+
+const controller = {};
+
+controller.agregarReceta = (req, res) => {
+    if (
+        typeof req.body.titulo == 'undefined' ||
+        typeof req.body.email == 'undefined' ||
+        typeof req.body.descripcion == 'undefined' ||
+        typeof req.body.imagen == 'undefined' ||
+        typeof req.body.ingredientes == 'undefined' ||
+        typeof req.body.pasos == 'undefined'
+    ) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error: Campos incompletos'
+            },
+            meta: {
+                status: 400
+            }
+        });
+        return;
+    }
+
+    const resValidaciones = validationResult(req).array();
+    if (resValidaciones.length > 0) {
+        console.log(resValidaciones);
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Campos inválidos',
+                content: resValidaciones
+            },
+            meta: {
+                status: 400
+            }
+        });
+        return;
+    }
+
+    const categorias = req.body.categorias ? `'${JSON.stringify(req.body.categorias)}'` : null;
+    const tiempoCoccion = req.body.tiempoCoccion ? `'${req.body.tiempoCoccion}'` : null;
+    const dificultad = req.body.dificultad ? `'${req.body.dificultad}'` : null;
+
+    db.query(
+        `CALL sp_crearReceta('${req.body.titulo}', '${req.body.email}', ${tiempoCoccion}, ${dificultad}, '${
+            req.body.descripcion
+        }', '${req.body.imagen}', '${JSON.stringify(req.body.ingredientes)}', '${JSON.stringify(req.body.pasos)}', ${categorias});`,
+        (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error
+                    },
+                    meta: {
+                        status: 500
+                    }
+                });
+                return;
+            } else {
+                const resultados = results[0][0];
+                if (resultados.success === 0) {
+                    funcionesComunes.manejoRespuestas(res, {
+                        errors: {
+                            message: resultados.message
+                        },
+                        meta: {
+                            status: 400
+                        }
+                    });
+                } else {
+                    funcionesComunes.manejoRespuestas(res, {
+                        data: {
+                            message: resultados.message
+                        },
+                        meta: {
+                            status: 200
+                        }
+                    });
+                }
+
+                return;
+            }
+        }
+    );
+};
+
+module.exports = controller;
+
+
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error al verificar el token'
+            },
+            meta: {
+                status: 500
+            }
+        });
+    }
+};
+
+
 module.exports = controller;
