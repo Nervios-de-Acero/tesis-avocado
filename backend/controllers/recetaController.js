@@ -11,6 +11,7 @@ const controller = {};
 controller.getRecetasUsuario = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token);
+    // const isAdmin =
 
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
