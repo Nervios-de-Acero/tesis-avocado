@@ -5,10 +5,11 @@ USE Avocado;
 CREATE TABLE usuarios(
 idUsuario INT PRIMARY KEY AUTO_INCREMENT,
 nombreCompleto VARCHAR(150) NOT NULL,
-imagen LONGBLOB,
+imagen TEXT,
 usuario VARCHAR(15) UNIQUE,
 email VARCHAR(200) UNIQUE NOT NULL,
-contraseña CHAR(60) NOT NULL
+contraseña CHAR(60) NOT NULL,
+isAdmin BIT NOT NULL
 );
 
 CREATE TABLE recetas(
@@ -39,7 +40,6 @@ CONSTRAINT fk_receta FOREIGN KEY(idReceta) REFERENCES recetas(idReceta)
 CREATE TABLE pasos(
 idPaso INT PRIMARY KEY AUTO_INCREMENT,
 idReceta INT NOT NULL,
-titulo VARCHAR(20) NOT NULL,
 descripcion TEXT NOT NULL,
 CONSTRAINT fk_paso FOREIGN KEY(idReceta) REFERENCES recetas(idReceta)
 );
@@ -60,6 +60,13 @@ CONSTRAINT fk_catReceta FOREIGN KEY(idReceta) REFERENCES recetas(idReceta),
 CONSTRAINT fk_catCategoria FOREIGN KEY(idCategoria) REFERENCES categorias(idCategoria)
 );
 
+CREATE TABLE productos(
+idProducto INT PRIMARY KEY AUTO_INCREMENT,
+nombre VARCHAR(150) NOT NULL,
+cantPersonas INT NOT NULL,
+cantRecetas INT NOT NULL,
+precio INT NOT NULL
+);
 
 -- INSERTAR CATEGORIAS PARA LA TABLA CATEGORIAS
 INSERT INTO categorias (idCategoria, nombre) VALUES (1, 'Desayuno'), (2, 'Almuerzo'), (3, 'Cena'), (4, 'Entradas'), (5, 'Aperitivos'), (6, 'Snacks'), 
