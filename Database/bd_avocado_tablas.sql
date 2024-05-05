@@ -5,10 +5,11 @@ USE Avocado;
 CREATE TABLE usuarios(
 idUsuario INT PRIMARY KEY AUTO_INCREMENT,
 nombreCompleto VARCHAR(150) NOT NULL,
-imagen LONGBLOB,
+imagen TEXT,
 usuario VARCHAR(15) UNIQUE,
 email VARCHAR(200) UNIQUE NOT NULL,
-contraseña CHAR(60) NOT NULL
+contraseña CHAR(60) NOT NULL,
+isAdmin BIT NOT NULL
 );
 
 CREATE TABLE recetas(
