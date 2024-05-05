@@ -25,18 +25,6 @@ controller.getRecetasUsuario = (req, res) => {
         return;
     }
 
-    // if (!isAdmin) {
-    //     funcionesComunes.manejoRespuestas(res, {
-    //         errors: {
-    //             message: 'Error. Email obligatorio.',
-    //         },
-    //         meta: {
-    //             status: 401,
-    //         },
-    //     });
-    //     return;
-    // }
-
     //Importante el try/catch() en caso de suceder error en el db.query
     try {
         db.query(`CALL sp_getRecetasUsuario('${email}')`, (error, results) => {
