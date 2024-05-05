@@ -13,18 +13,53 @@ BEGIN
 END
 //
 
--- Registro
+/********************** SP REGISTRO ********************/
 DELIMITER //
-CREATE PROCEDURE `sp_registro`(IN userEmail VARCHAR(200), IN userFullName VARCHAR(150), IN userName VARCHAR(15), IN pass CHAR(60))
+CREATE PROCEDURE `sp_registro`(
+IN userEmail VARCHAR(200), 
+IN userFullName VARCHAR(150), 
+IN userName VARCHAR(15), 
+IN pass CHAR(60), 
+IN adminFlag BIT)
 BEGIN
 	DECLARE mailBD VARCHAR(200);
-	SET mailBD = (SELECT email FROM usuarios WHERE email = userEmail);
-	IF mailBD IS NULL 
+	
+    IF userEmail IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Email obligatorio';
+	END IF;
+    
+    IF userFullName IS NULL OR userName IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Nombre completo y nombre de usuario obligatorios.';
+	END IF;
+    
+	IF pass IS NULL
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Password obligatorio.';
+	END IF;
+    
+    IF adminFlag IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: El parámetro para el tipo de usuario no debe estar vacío.';
+	ELSEIF adminFlag NOT IN (0, 1) 
+    THEN
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: El parámetro para el tipo de usuario debe ser 0 o 1.';
+	END IF;
+    
+    SET mailBD = (SELECT email FROM usuarios WHERE email = userEmail);
+	IF mailBD IS NOT NULL 
 		THEN 
-			INSERT INTO usuarios (nombreCompleto, imagen, usuario, email, contraseña)
-			VALUES(userFullName, NULL, userName, userEmail, pass);
-			SELECT true AS success, 'Usuario registrado' AS message;
-		ELSE SELECT false AS success, 'Ya existe un usuario con este email' AS message;
+			SIGNAL SQLSTATE '45007'
+			SET MESSAGE_TEXT = 'Error: Ya existe un usuario con ese email.';
+		ELSE 
+			INSERT INTO usuarios (nombreCompleto, imagen, usuario, email, contraseña, isAdmin)
+			VALUES(userFullName, NULL, userName, userEmail, pass, adminFlag);
 	END IF;
 END
 //
@@ -276,7 +311,7 @@ END
 
 
 DELIMITER //
-CREATE PROCEDURE sp_crearPasoIngredienteCategoria (
+CREATE PROCEDURE `sp_crearPasoIngredienteCategoria` (
 IN idR INT,
 IN arr JSON,
 IN tipo VARCHAR(25)
