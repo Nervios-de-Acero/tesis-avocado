@@ -16,12 +16,17 @@ require('dotenv').config()
 
 const app = express()
 
+
+//Configuracion render
+app.set('view engine', 'ejs');
+
 //Importar rutas
 const recetaRouter = require('./routes/receta')
 const usuarioRouter = require('./routes/usuario')
 const loginRouter = require('./routes/login')
 const logoutRouter = require('./routes/logout')
 const registroRouter = require('./routes/registro')
+const panelRouter = require('./routes/panel');
 const testRouter = require('./routes/test');
 
 //conexión db
@@ -110,6 +115,7 @@ app.use('/usuario', usuarioRouter)
 app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/registro', registroRouter)
+app.use('/panel', panelRouter);
 app.use('/test', testRouter);
 
 
