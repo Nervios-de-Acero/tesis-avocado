@@ -81,6 +81,11 @@ controller.getRecetasUsuario = (req, res) => {
     return;
 };
 
+controller.modificarReceta = (req, res) => {
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token)
+}
+
 //#endregion
 
 module.exports = controller;
