@@ -16,12 +16,17 @@ require('dotenv').config()
 
 const app = express()
 
+
+//Configuracion render
+app.set('view engine', 'ejs');
+
 //Importar rutas
 const recetaRouter = require('./routes/receta')
 const usuarioRouter = require('./routes/usuario')
 const loginRouter = require('./routes/login')
 const logoutRouter = require('./routes/logout')
 const registroRouter = require('./routes/registro')
+const panelRouter = require('./routes/panel');
 const adminRouter = require('./routes/admin');
 const testRouter = require('./routes/test');
 
@@ -96,12 +101,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
 app.use(cors());
 
-//Rutas
-app.use('/receta', recetaRouter);
-app.use('/usuario', usuarioRouter);
-app.use('/login', loginRouter);
-app.use('/logout', logoutRouter);
-app.use('/registro', registroRouter);
+//Rutas 
+app.use('/receta', recetaRouter)
+app.use('/usuario', usuarioRouter)
+app.use('/login', loginRouter)
+app.use('/logout', logoutRouter)
+app.use('/registro', registroRouter)
+app.use('/panel', panelRouter);
 app.use('/admin', adminRouter);
 app.use('/test', testRouter);
 
