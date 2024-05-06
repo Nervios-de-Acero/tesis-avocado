@@ -13,18 +13,53 @@ BEGIN
 END
 //
 
--- Registro
+/********************** SP REGISTRO ********************/
 DELIMITER //
-CREATE PROCEDURE `sp_registro`(IN userEmail VARCHAR(200), IN userFullName VARCHAR(150), IN userName VARCHAR(15), IN pass CHAR(60))
+CREATE PROCEDURE `sp_registro`(
+IN userEmail VARCHAR(200), 
+IN userFullName VARCHAR(150), 
+IN userName VARCHAR(15), 
+IN pass CHAR(60), 
+IN adminFlag BIT)
 BEGIN
 	DECLARE mailBD VARCHAR(200);
-	SET mailBD = (SELECT email FROM usuarios WHERE email = userEmail);
-	IF mailBD IS NULL 
+	
+    IF userEmail IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Email obligatorio';
+	END IF;
+    
+    IF userFullName IS NULL OR userName IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Nombre completo y nombre de usuario obligatorios.';
+	END IF;
+    
+	IF pass IS NULL
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: Password obligatorio.';
+	END IF;
+    
+    IF adminFlag IS NULL 
+	THEN 
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: El parámetro para el tipo de usuario no debe estar vacío.';
+	ELSEIF adminFlag NOT IN (0, 1) 
+    THEN
+		SIGNAL SQLSTATE '45007'
+		SET MESSAGE_TEXT = 'Error: El parámetro para el tipo de usuario debe ser 0 o 1.';
+	END IF;
+    
+    SET mailBD = (SELECT email FROM usuarios WHERE email = userEmail);
+	IF mailBD IS NOT NULL 
 		THEN 
-			INSERT INTO usuarios (nombreCompleto, imagen, usuario, email, contraseña)
-			VALUES(userFullName, NULL, userName, userEmail, pass);
-			SELECT true AS success, 'Usuario registrado' AS message;
-		ELSE SELECT false AS success, 'Ya existe un usuario con este email' AS message;
+			SIGNAL SQLSTATE '45007'
+			SET MESSAGE_TEXT = 'Error: Ya existe un usuario con ese email.';
+		ELSE 
+			INSERT INTO usuarios (nombreCompleto, imagen, usuario, email, contraseña, isAdmin)
+			VALUES(userFullName, NULL, userName, userEmail, pass, adminFlag);
 	END IF;
 END
 //
@@ -127,108 +162,18 @@ END
 //
 
 
--- Insertar un ingrediente
-DELIMITER //
-CREATE PROCEDURE `sp_crearIngrediente` (IN idR INT, IN ingredientes JSON)
-BEGIN
-	DECLARE largo INT;
-	DECLARE i INT;
-	DECLARE indice VARCHAR(5);
-	SELECT JSON_LENGTH(ingredientes) INTO largo;
-	SET i = 0;
-	WHILE i < largo DO
-		SELECT CONCAT('$[', i, ']') INTO indice;
-		SET @nombre = JSON_UNQUOTE(JSON_EXTRACT(ingredientes, indice));
-        
-		INSERT INTO ingredientes (idReceta, nombre)
-		VALUES (idR, @nombre);
-        
-		SET i = i + 1;
-	END WHILE;
-END
-//
-
-DELIMITER //
-CREATE PROCEDURE `sp_actualizarIngredientes` (IN idR INT, IN ingredientes JSON)
-BEGIN
-DELETE FROM ingredientes WHERE idReceta = idR;
-CALL sp_crearIngrediente(idR, ingredientes);
-UPDATE recetas SET fechaActualizacion = NOW() WHERE idReceta = idR;
-END
-//
-
-DELIMITER //
-CREATE PROCEDURE `sp_crearPaso` (IN idR INT, IN pasos JSON)
-BEGIN
-DECLARE largo INT;
-	DECLARE i INT;
-	DECLARE indiceTitulo VARCHAR(25);
-    DECLARE indiceDescripcion VARCHAR(25);
-	SELECT JSON_LENGTH(pasos) INTO largo;
-	SET i = 0;
-	WHILE i < largo DO
-		SELECT CONCAT('$[', i, '].titulo') INTO indiceTitulo;
-        SELECT CONCAT('$[', i, '].descripcion') INTO indiceDescripcion;
-        
-		SET @titulo = JSON_UNQUOTE(JSON_EXTRACT(pasos, indiceTitulo));
-        SET @descripcion = JSON_UNQUOTE(JSON_EXTRACT(pasos, indiceDescripcion));
-        
-		INSERT INTO pasos (idReceta, titulo, descripcion)
-		VALUES (idR, @titulo, @descripcion);
-        
-		SET i = i + 1;
-	END WHILE;
-END
-//
-
-DELIMITER //
-CREATE PROCEDURE `sp_actualizarPasos` (IN idR INT, IN pasos JSON)
-BEGIN
-IF (SELECT idReceta FROM recetas WHERE idReceta = idR) IS NOT NULL
-THEN
-DELETE FROM pasos WHERE idReceta = idR;
-CALL sp_crearPaso(idR, pasos);
-UPDATE recetas SET fechaActualizacion = NOW() WHERE idReceta = idR;
-ELSE SELECT 'La receta no existe' AS message;
-END IF;
-END
-//
-
-DELIMITER //
-CREATE PROCEDURE `sp_crearCategoria` (IN idR INT, IN categorias JSON)
-BEGIN
-DECLARE largo INT;
-	DECLARE i INT;
-	DECLARE indice VARCHAR(5);
-	SELECT JSON_UNQUOTE(JSON_LENGTH(categorias)) INTO largo;
-	SET i = 0;
-	WHILE i < largo DO
-		SELECT CONCAT('$[', i, ']') INTO indice;
-		SET @categoria = CAST(JSON_EXTRACT(categorias, indice) AS SIGNED);
-        
-		INSERT INTO recetas_categorias (idReceta, idCategoria)
-		VALUES (idR, @categoria);
-        
-		SET i = i + 1;
-	END WHILE;
-END
-//
-
-DELIMITER //
-CREATE PROCEDURE `sp_actualizarCategoria` (IN idR INT, IN categorias JSON)
-BEGIN
-DELETE FROM recetas_categorias WHERE idReceta = idR;
-IF categorias IS NOT NULL
-THEN CALL sp_crearCategoria(idR, categorias);
-END IF;
-UPDATE recetas SET fechaActualizacion = NOW() WHERE idReceta = idR;
-END
-//
-
 /************************NUEVO SP CREAR RECETA***************************/
 DELIMITER //
-CREATE PROCEDURE "sp_crearReceta"(IN emailCreador VARCHAR(250), IN tituloR VARCHAR(250) , IN tiempoCoccionR VARCHAR(20), IN dificultadR VARCHAR(12), 
-IN descripcionR TEXT, IN imagenR TEXT, IN ingredientes JSON , IN pasos JSON, IN categorias JSON)
+CREATE PROCEDURE "sp_crearReceta"(
+IN emailCreador VARCHAR(250), 
+IN tituloR VARCHAR(250) , 
+IN tiempoCoccionR VARCHAR(20), 
+IN dificultadR VARCHAR(12), 
+IN descripcionR TEXT, 
+IN imagenR TEXT, 
+IN ingredientes JSON , 
+IN pasos JSON, 
+IN categorias JSON)
 BEGIN
 	DECLARE idR INT;
 	DECLARE idUser INT;
@@ -261,22 +206,7 @@ END //
 
 
 DELIMITER //
-CREATE PROCEDURE `sp_actualizarDatosReceta`(IN idR INT, IN descripcionR TEXT, IN tiempoCoccionR VARCHAR(20), IN dificultadR VARCHAR(15))
-BEGIN 
-	UPDATE recetas SET descripcion = descripcionR WHERE idReceta = idR;
-		IF tiempoCoccionR IS NOT NULL
-			THEN UPDATE recetas SET tiempoCoccion = tiempoCoccionR WHERE idReceta = idR;
-		END IF;
-		IF dificultadR IS NOT NULL
-			THEN UPDATE recetas SET dificultad = dificultadR WHERE idReceta = idR;
-		END IF;
-	UPDATE recetas SET fechaActualizacion = NOW();
-END
-//
-
-
-DELIMITER //
-CREATE PROCEDURE sp_crearPasoIngredienteCategoria (
+CREATE PROCEDURE `sp_crearPasoIngredienteCategoria` (
 IN idR INT,
 IN arr JSON,
 IN tipo VARCHAR(25)
