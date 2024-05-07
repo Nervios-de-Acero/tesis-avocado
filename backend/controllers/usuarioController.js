@@ -1,8 +1,9 @@
 const db = require('../conection');
-<<<<<<< Updated upstream
-const { validationResult } = require('express-validator');
 const funcionesToken = require('../utils/token');
 const funcionesComunes = require('../utils/funcionesComunes');
+const tokenFunctions = require('../utils/token');
+const validacionesPassword = require('./validacionesPassword'); // Importar el archivo de validaciones
+const { validationResult } = require('express-validator'); // Agregar la importación de validationResult
 
 const controller = {};
 
@@ -36,30 +37,11 @@ controller.actualizarPerfil = (req, res) => {
             meta: {
                 status: 406,
             },
-=======
-const funcionesComunes = require('../utils/funcionesComunes');
-const tokenFunctions = require('../utils/token');
-
-const controller = {};
-
-controller.modificarPassword = (req, res) => {
-    // Verificar el token
-    const token = req.headers.authorization;
-    if (!token) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Token de autenticación no proporcionado'
-            },
-            meta: {
-                status: 401
-            }
->>>>>>> Stashed changes
         });
         return;
     }
 
     try {
-<<<<<<< Updated upstream
         db.query(`CALL sp_actualizarPerfil('${email}', '${nombreCompleto}', '${imagen}', '${usuario}');`, function (error, results) {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
@@ -91,8 +73,24 @@ controller.modificarPassword = (req, res) => {
             },
         });
     }
-    return;
-=======
+};
+
+controller.modificarPassword = (req, res) => {
+    // Verificar el token
+    const token = req.headers.authorization;
+    if (!token) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Token de autenticación no proporcionado'
+            },
+            meta: {
+                status: 401
+            }
+        });
+        return;
+    }
+
+    try {
         const decodedToken = tokenFunctions.verifyToken(token);
         if (!decodedToken) {
             funcionesComunes.manejoRespuestas(res, {
@@ -106,23 +104,17 @@ controller.modificarPassword = (req, res) => {
             return;
         }
 
-        // Aquí continúa la lógica para modificar la contraseña
-        const resValidaciones = validationResult(req).array();
-        const pass = req.body.password;
-        const nuevoPass = req.body.nuevoPassword;
-        const email = req.body.email;
-
-        if (!email || !pass || !nuevoPass) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: 'Error. Faltan campos obligatorios'
-                },
-                meta: {
-                    status: 400
-                }
-            });
-            return;
-        }
+       // Validar los campos del formulario utilizando el esquema de validación
+       const errores = validacionesPassword.modificarPassword(req);
+       if (errores) {
+           funcionesComunes.manejoRespuestas(res, {
+               errors: errores,
+               meta: {
+                   status: 400
+               }
+           });
+           return;
+       }
 
         if (resValidaciones.length > 0) {
             funcionesComunes.manejoRespuestas(res, {
@@ -198,7 +190,8 @@ controller.modificarPassword = (req, res) => {
             }
         });
     }
->>>>>>> Stashed changes
 };
 
 module.exports = controller;
+
+
