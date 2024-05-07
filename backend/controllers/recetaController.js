@@ -1,13 +1,13 @@
 const db = require('../conection');
 const funcionesComunes = require('../utils/funcionesComunes');
 const funcionesToken = require('../utils/token');
+const { validationResult } = require('express-validator');
+const { validacionesRecetas } = require('../utils/validacionesRecetas');
 
 const controller = {};
 
 //#region Controladores
 
-//Se agrega el controlador como propiedad del objeto "controller"
-//Necesita como minimo parametros req y res
 controller.getRecetasUsuario = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token);
@@ -25,7 +25,6 @@ controller.getRecetasUsuario = (req, res) => {
         return;
     }
 
-    //Importante el try/catch() en caso de suceder error en el db.query
     try {
         db.query(`CALL sp_getRecetasUsuario('${email}')`, (error, results) => {
             if (error) {
@@ -88,8 +87,6 @@ controller.modificarReceta = (req, res) => {
 
 //#endregion
 
-
-
 controller.agregarReceta = (req, res) => {
     // Verificar el token
     const token = req.headers.authorization;
@@ -119,96 +116,65 @@ controller.agregarReceta = (req, res) => {
             return;
         }
 
-        const db = require('../conection');
-const funcionesComunes = require('../utils/funcionesComunes');
+        const resValidaciones = validationResult(req).array();
+        if (resValidaciones.length > 0) {
+            funcionesComunes.manejoRespuestas(res, {
+                errors: {
+                    message: 'Campos inválidos',
+                    content: resValidaciones
+                },
+                meta: {
+                    status: 400
+                }
+            });
+            return;
+        }
 
-const controller = {};
+        const categorias = req.body.categorias ? `'${JSON.stringify(req.body.categorias)}'` : null;
+        const tiempoCoccion = req.body.tiempoCoccion ? `'${req.body.tiempoCoccion}'` : null;
+        const dificultad = req.body.dificultad ? `'${req.body.dificultad}'` : null;
 
-controller.agregarReceta = (req, res) => {
-    if (
-        typeof req.body.titulo == 'undefined' ||
-        typeof req.body.email == 'undefined' ||
-        typeof req.body.descripcion == 'undefined' ||
-        typeof req.body.imagen == 'undefined' ||
-        typeof req.body.ingredientes == 'undefined' ||
-        typeof req.body.pasos == 'undefined'
-    ) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Error: Campos incompletos'
-            },
-            meta: {
-                status: 400
-            }
-        });
-        return;
-    }
-
-    const resValidaciones = validationResult(req).array();
-    if (resValidaciones.length > 0) {
-        console.log(resValidaciones);
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Campos inválidos',
-                content: resValidaciones
-            },
-            meta: {
-                status: 400
-            }
-        });
-        return;
-    }
-
-    const categorias = req.body.categorias ? `'${JSON.stringify(req.body.categorias)}'` : null;
-    const tiempoCoccion = req.body.tiempoCoccion ? `'${req.body.tiempoCoccion}'` : null;
-    const dificultad = req.body.dificultad ? `'${req.body.dificultad}'` : null;
-
-    db.query(
-        `CALL sp_crearReceta('${req.body.titulo}', '${req.body.email}', ${tiempoCoccion}, ${dificultad}, '${
-            req.body.descripcion
-        }', '${req.body.imagen}', '${JSON.stringify(req.body.ingredientes)}', '${JSON.stringify(req.body.pasos)}', ${categorias});`,
-        (error, results) => {
-            if (error) {
-                funcionesComunes.manejoRespuestas(res, {
-                    errors: {
-                        message: error
-                    },
-                    meta: {
-                        status: 500
-                    }
-                });
-                return;
-            } else {
-                const resultados = results[0][0];
-                if (resultados.success === 0) {
+        db.query(
+            `CALL sp_crearReceta('${req.body.titulo}', '${req.body.email}', ${tiempoCoccion}, ${dificultad}, '${
+                req.body.descripcion
+            }', '${req.body.imagen}', '${JSON.stringify(req.body.ingredientes)}', '${JSON.stringify(req.body.pasos)}', ${categorias});`,
+            (error, results) => {
+                if (error) {
                     funcionesComunes.manejoRespuestas(res, {
                         errors: {
-                            message: resultados.message
+                            message: error
                         },
                         meta: {
-                            status: 400
+                            status: 500
                         }
                     });
+                    return;
                 } else {
-                    funcionesComunes.manejoRespuestas(res, {
-                        data: {
-                            message: resultados.message
-                        },
-                        meta: {
-                            status: 200
-                        }
-                    });
+                    const resultados = results[0][0];
+                    if (resultados.success === 0) {
+                        funcionesComunes.manejoRespuestas(res, {
+                            errors: {
+                                message: resultados.message
+                            },
+                            meta: {
+                                status: 400
+                            }
+                        });
+                    } else {
+                        funcionesComunes.manejoRespuestas(res, {
+                            data: {
+                                message: resultados.message
+                            },
+                            meta: {
+                                status: 200
+                            }
+                        });
+                    }
+
+                    return;
                 }
-
-                return;
             }
-        }
-    );
-};
-
-module.exports = controller;
-
-
+        );
     } catch (error) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
@@ -220,6 +186,5 @@ module.exports = controller;
         });
     }
 };
-
 
 module.exports = controller;
