@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <form name="testForm" action="/panel/example" method="POST">
+        <label> <%= locals.testTitle %> 
+            <input type="text" name="testInput" placeholder="<%= locals.testValue %>" >
+        </label>
+        <button type="submit">Sale?</button>
+    </form>
+</body>
+</html>
