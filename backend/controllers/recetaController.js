@@ -84,6 +84,63 @@ controller.getRecetasUsuario = (req, res) => {
 controller.modificarReceta = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token)
+
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
+
+    const idR = req.body.idReceta || null,
+        titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = req.body.ingredientes || null,
+        pasos = req.body.pasos || null,
+        imagen = req.body.imagen || null;
+    
+        console.log(dificultad)
+
+    try {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, NULL, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), imagen], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta actualizada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
 }
 
 //#endregion
