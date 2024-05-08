@@ -1,30 +1,15 @@
 const bcrypt = require('bcrypt')
 const db = require('../conection')
 const funcionesComunes = require('../utils/funcionesComunes');
-const {validationResult} = require('express-validator')
+
 const controller = {}
 
 controller.registro = (req, res) => {
 
-const resValidaciones = validationResult(req).array()
-
-if(resValidaciones.length > 0){
-  funcionesComunes.manejoRespuestas(res, {
-    errors: {
-        message: "Error de validación",
-        content: resValidaciones
-    },
-    meta: {
-        status: 400,
-    },
-})
-  return
-}
-
 const email = req.body.email,
-  nombreCompleto = req.body.nombreCompleto,
-  usuario = req.body.usuario,
-  pass = bcrypt.hashSync(req.body.password, 12);
+    nombreCompleto = req.body.nombreCompleto,
+    usuario = req.body.usuario,
+    pass = bcrypt.hashSync(req.body.password, 12);
 
 // lógica de registro
   try {

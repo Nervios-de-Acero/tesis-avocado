@@ -1,3 +1,4 @@
+const {validationResult} = require('express-validator')
 const funciones = {};
 
 //#region Funciones
@@ -14,6 +15,24 @@ funciones.manejoRespuestas = (res, datos) => {
 
     return res.status(meta.status).send(response);
 };
+
+funciones.validarJSON = (req, res, next) => {
+const resValidaciones = validationResult(req).array()
+
+if(resValidaciones.length > 0){
+    funciones.manejoRespuestas(res, {
+        errors: {
+            message: "Error de validación",
+            content: resValidaciones
+        },
+        meta: {
+            status: 400,
+        },
+})
+    return 
+}
+    next()
+}
 
 //#endregion
 
