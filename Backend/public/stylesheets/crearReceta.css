@@ -1,0 +1,12 @@
+body{
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.title-container{
+}
+
+.title-main{
+    position: relative;
+    top: 100%;
+}
