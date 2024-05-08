@@ -1,24 +1,25 @@
 const bcrypt = require('bcrypt')
 const db = require('../conection')
 const funcionesComunes = require('../utils/funcionesComunes');
+const {validationResult} = require('express-validator')
 const controller = {}
 
 controller.registro = (req, res) => {
-//   if(Object.keys(req.body).length === 0 || typeof req.body.password === 'undefined' || typeof req.body.email === 'undefined' || typeof req.body.nombreCompleto === 'undefined' || typeof req.body.usuario === 'undefined'){
-//     res.status(400).send('Bad request. Campos incorrectos')
-//     return
-// } 
-// const resValidaciones = validationResult(req).array()
 
-// if(resValidaciones.length > 0){
-//   res.send({
-//     success: false,
-//     message: "Error en registro. Campos inválidos",
-//     content: resValidaciones
-//   })
-//   console.log(req.body)
-//   return
-// }
+const resValidaciones = validationResult(req).array()
+
+if(resValidaciones.length > 0){
+  funcionesComunes.manejoRespuestas(res, {
+    errors: {
+        message: "Error de validación",
+        content: resValidaciones
+    },
+    meta: {
+        status: 400,
+    },
+})
+  return
+}
 
 const email = req.body.email,
   nombreCompleto = req.body.nombreCompleto,
