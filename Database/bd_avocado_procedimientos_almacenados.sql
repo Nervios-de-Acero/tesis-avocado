@@ -263,6 +263,7 @@ END //
 DELIMITER //
 CREATE PROCEDURE "sp_actualizarReceta" (
 IN idR INT, 
+IN tituloR VARCHAR(250),
 IN descripcionR TEXT, 
 IN tiempoCoccionR VARCHAR(20), 
 IN dificultadR VARCHAR(15),
@@ -288,6 +289,10 @@ BEGIN
     SIGNAL SQLSTATE '45004'
     SET MESSAGE_TEXT = 'Error: El valor de categoriasR no es un JSON válido';
     END IF;
+    
+    IF tituloR IS NOT NULL
+		THEN UPDATE recetas SET titulo = tituloR WHERE idReceta = idR;
+ 	END IF;
 
 	IF descripcionR IS NOT NULL
 		THEN UPDATE recetas SET descripcion = descripcionR WHERE idReceta = idR;
@@ -319,7 +324,7 @@ BEGIN
      
 	IF pasosR IS NOT NULL
 		THEN 
-			DELETE FROM ingredientes WHERE idReceta = idR;
+			DELETE FROM pasos WHERE idReceta = idR;
  			CALL sp_crearPasoIngredienteCategoria(idR, pasosR, 'pasos');
  	END IF;
     
