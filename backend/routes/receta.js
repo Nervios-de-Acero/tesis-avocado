@@ -3,6 +3,7 @@ const router = express.Router();
 const { checkSchema, validationResult } = require('express-validator');
 const validacion = require('../utils/validacionesRecetas');
 const funcionesToken = require('../utils/token');
+const funcionesComunes = require('../utils/funcionesComunes')
 
 //#region Controllers
 
@@ -245,25 +246,7 @@ router.get('/getCategorias', (req, res) => {
     });
 });
 
-router.get('/getRecetasFeed', (req, res) => {
-    db.query(
-        `SELECT  r.idReceta, r.titulo, u.usuario AS creadoPor, CONVERT(r.imagen USING utf8) AS imagen, r.fechaCreacion, r.descripcion, r.fechaActualizacion FROM recetas r INNER JOIN usuarios u ON u.idUsuario = r.creadoPor LIMIT 20;`,
-        function (error, results) {
-            if (error) {
-                res.send({
-                    success: false,
-                    message: error,
-                });
-            } else {
-                res.send({
-                    success: true,
-                    message: '',
-                    content: results,
-                });
-            }
-        }
-    );
-});
+router.get('/getRecetasFeed', recetaController.getRecetasFeed);
 
 router.get('/buscarReceta/:titulo', (req, res) => {
     const titulo = req.params.titulo;
