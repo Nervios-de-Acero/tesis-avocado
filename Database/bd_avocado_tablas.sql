@@ -105,3 +105,9 @@ VALUES
 (1, '100g de queso feta'),
 (1, 'un bollo de pan'),
 (1, 'aderezo a gusto');
+
+INSERT INTO productos(nombre, cantPersonas, cantRecetas, precio)
+VALUES 
+('Plan Individual', 1, 4, 6000), 
+('Plan Dúo', 2, 3, 8800), 
+('Plan Familiar', 4, 5, 12000);

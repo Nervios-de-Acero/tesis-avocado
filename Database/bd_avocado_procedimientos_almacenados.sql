@@ -95,7 +95,7 @@ BEGIN
 			  WHERE rc.idReceta = idRequest
 			),
 			pasos AS (
-			  SELECT JSON_ARRAYAGG(JSON_OBJECT('idPaso',p.idPaso ,'titulo', p.titulo, 'descripcion', p.descripcion)) AS pasos
+			  SELECT JSON_ARRAYAGG(JSON_OBJECT('idPaso',p.idPaso, 'descripcion', p.descripcion)) AS pasos
 			  FROM pasos p
 			  INNER JOIN recetas r
 			  ON r.idReceta = p.idReceta
@@ -108,7 +108,7 @@ BEGIN
 			WHERE r.idReceta = idRequest
 			),
 			recetas AS (
-			SELECT r.idReceta, r.titulo, u.usuario AS creadoPor, u.email AS emailCreadoPor, r.tiempoCoccion, r.dificultad, CONVERT(r.imagen USING utf8mb4) AS imagen, 
+			SELECT r.idReceta, r.titulo, u.usuario AS creadoPor, u.email AS emailCreadoPor, r.tiempoCoccion, r.dificultad, r.imagen AS imagen, 
             r.fechaCreacion, r.fechaActualizacion, r.descripcion 
             FROM recetas r
             INNER JOIN usuarios u
@@ -118,7 +118,8 @@ BEGIN
 			SELECT * 
             FROM recetas, ingredientes, pasos, categorias;
 		ELSE
-			SELECT 'No hay registros' AS result;
+			SIGNAL SQLSTATE '45006'
+		    SET MESSAGE_TEXT = 'Error: Receta inexistente';
 	END IF;
 END
 //
@@ -161,7 +162,6 @@ END
 //
 
 
-/************************NUEVO SP CREAR RECETA***************************/
 DELIMITER //
 CREATE PROCEDURE "sp_crearReceta"(
 IN emailCreador VARCHAR(250), 
@@ -328,5 +328,27 @@ BEGIN
  	END IF;
     
 	UPDATE recetas SET fechaActualizacion = NOW();
+END
+//
+
+DELIMITER //
+CREATE PROCEDURE "sp_getRecetasFeed"(IN limite INT)
+BEGIN
+IF limite IS NULL
+	THEN
+	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
+	FROM recetas;
+ELSE 
+	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
+	FROM recetas
+	LIMIT limite;
+END IF;
+END
+//
+
+DELIMITER //
+CREATE PROCEDURE `sp_getProductos`()
+BEGIN
+SELECT * FROM productos;
 END
 //
