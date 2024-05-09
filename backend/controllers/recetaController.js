@@ -105,8 +105,6 @@ controller.modificarReceta = (req, res) => {
         ingredientes = req.body.ingredientes || null,
         pasos = req.body.pasos || null,
         imagen = req.body.imagen || null;
-    
-        console.log(dificultad)
 
     try {
         db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, NULL, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), imagen], (error, results) => {
@@ -153,6 +151,58 @@ controller.getProductos = (req, res) => {
                     },
                     meta: {
                         status: 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.getRecetasFeed = (req, res) => {
+
+    const limite = Number(req.query.limite) || null
+    // if(limite && Number.isNaN(limite)){
+    //     console.log(Number.isInteger(limite))
+    //     funcionesComunes.manejoRespuestas(res, {
+    //         errors: {
+    //             message: 'Error: El límite debe ser un número entero. ',
+    //         },
+    //         meta: {
+    //             status:  400,
+    //         },
+    //     })
+    //     return
+    // }
+
+    try {
+        db.query(`CALL sp_getRecetasFeed(?);`, [limite], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status:  500,
                     },
                 });
             } else {
