@@ -331,3 +331,10 @@ BEGIN
 	UPDATE recetas SET fechaActualizacion = NOW();
 END
 //
+
+DELIMITER //
+CREATE PROCEDURE `sp_getSuscripciones`()
+BEGIN
+SELECT * FROM productos;
+END
+//
