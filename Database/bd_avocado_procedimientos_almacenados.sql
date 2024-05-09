@@ -333,7 +333,7 @@ END
 //
 
 DELIMITER //
-CREATE PROCEDURE `sp_getSuscripciones`()
+CREATE PROCEDURE `sp_getProductos`()
 BEGIN
 SELECT * FROM productos;
 END
