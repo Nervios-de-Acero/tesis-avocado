@@ -143,6 +143,43 @@ controller.modificarReceta = (req, res) => {
     return;
 }
 
+controller.getProductos = (req, res) => {
+    try {
+        db.query(`CALL sp_getProductos();`, (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
 //#endregion
 
 module.exports = controller;

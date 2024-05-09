@@ -245,6 +245,8 @@ router.get('/getCategorias', (req, res) => {
     });
 });
 
+router.get('/getProductos', recetaController.getProductos)
+
 router.get('/getRecetasFeed', (req, res) => {
     db.query(
         `SELECT  r.idReceta, r.titulo, u.usuario AS creadoPor, CONVERT(r.imagen USING utf8) AS imagen, r.fechaCreacion, r.descripcion, r.fechaActualizacion FROM recetas r INNER JOIN usuarios u ON u.idUsuario = r.creadoPor LIMIT 20;`,
