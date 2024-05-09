@@ -13,7 +13,6 @@ BEGIN
 END
 //
 
-/********************** SP REGISTRO ********************/
 DELIMITER //
 CREATE PROCEDURE `sp_registro`(
 IN userEmail VARCHAR(200), 
