@@ -12,6 +12,10 @@ router.route('/example')
 .get(panelController.renderizarExample)
 .post(panelController.renderizarExampleSubmit);
 
+router.route('/crearReceta')
+.get(panelController.renderCrearReceta)
+.post(panelController.agregarReceta);
+
 //#region endpoints
 
 //#endregion

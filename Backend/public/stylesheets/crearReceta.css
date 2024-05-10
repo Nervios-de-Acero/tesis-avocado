@@ -1,12 +1,76 @@
 body{
     background-color: #000000;
     color: #FFFFFF;
+    font-family: 'Roboto', sans-serif;
+}
+
+textarea{
+    resize: none;
 }
 
 .title-container{
+    display: block;
+    max-width:fit-content;
+    border: 2px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .title-main{
-    position: relative;
-    top: 100%;
+    font-size: 24px;
+}
+
+.btnItem{
+    margin-left: 1px;
+    border-top-left-radius: 1px;
+    border-bottom-left-radius: 1px;
+}
+
+.inputItem{
+    margin-right: 5px;
+}
+
+.obligatorio{
+    color:crimson;
+}
+
+.textareaReceta{
+    min-height: 175px !important;
+    overflow-y: auto !important;
+}
+
+.containerItems{
+    height: 390px !important;
+    overflow-y: auto;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    word-wrap: break-word;
+    border-bottom: 1px solid #ced4da;
+    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+}
+
+.itemContenido{
+    flex: 1;
+    max-width: 24em;
+    border-right: 1px solid #ced4da;
+}
+
+.btnBorrarItem{
+    padding: 1px 5px 1px 5px;
+    margin-left: 5px;
+    align-self:baseline;
+    font-weight: 800;
 }

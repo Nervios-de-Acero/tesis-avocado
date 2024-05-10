@@ -29,6 +29,18 @@ controller.renderizarExampleSubmit = (req, res) => {
     });
 }
 
+controller.renderCrearReceta = (req, res) => {
+
+    res.render(`crearReceta`);
+}
+
+controller.agregarReceta = (req, res) =>{
+    
+    const response = JSON.parse(req.body.inputResponse)
+
+    console.log(response)
+    res.render(`crearReceta`);
+}
 //#endregion
 
 module.exports = controller;
