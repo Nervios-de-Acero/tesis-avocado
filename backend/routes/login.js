@@ -6,20 +6,7 @@ const validaciones = require('../utils/validacionesLogin');
 const { login } = require('../controllers/loginController');
 
 // Iniciar sesión
-router.post('/', checkSchema(validaciones), (req, res) => {
-  const resValidaciones = validationResult(req).array();
-
-  if (resValidaciones.length > 0) {
-    res.send({
-      success: false,
-      message: 'Error al iniciar sesión. Campos inválidos',
-      content: resValidaciones
-    });
-    return;
-  }
-
-  login(req, res);
-});
+router.post('/', checkSchema(validaciones), funcionesComunes.validarJSON, login);
 
 module.exports = router;
 
