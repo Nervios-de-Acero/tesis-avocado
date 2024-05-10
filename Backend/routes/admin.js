@@ -12,7 +12,7 @@ const recetaController = require('../controllers/recetaController');
 
 //#region Rutas
 
-router.post('/agregarReceta', checkSchema(validacion), (req, res) => {
+router.post('/agregarReceta', funcionesToken.validateToken, checkSchema(validacion), (req, res) => {
     if (
         typeof req.body.titulo == 'undefined' ||
         typeof req.body.email == 'undefined' ||
@@ -69,7 +69,7 @@ router.post('/agregarReceta', checkSchema(validacion), (req, res) => {
     );
 });
 
-router.put('/modificarReceta', recetaController.modificarReceta)
+router.put('/modificarReceta', funcionesToken.validateToken, recetaController.modificarReceta)
 
 // router.put('/modificarImagenReceta', (req, res) => {
 //     if (typeof req.body.imagen === 'undefined' || typeof req.body.idReceta === 'undefined') {
