@@ -2,7 +2,7 @@ const db = require('../conection');
 const funcionesToken = require('../utils/token');
 const funcionesComunes = require('../utils/funcionesComunes');
 const tokenFunctions = require('../utils/token');
-const validacionesPassword = require('./validacionesPassword'); // Importar el archivo de validaciones
+const validacionesPassword = require('../utils/validacionesPassword'); // Importar el archivo de validaciones
 const { validationResult } = require('express-validator'); // Agregar la importación de validationResult
 
 const controller = {};
