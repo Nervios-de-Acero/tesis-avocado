@@ -352,3 +352,35 @@ BEGIN
 SELECT * FROM productos;
 END
 //
+
+DELIMITER //
+CREATE PROCEDURE `sp_crearProducto`(IN nombre VARCHAR(150), IN personas INT, IN recetas INT, IN precio INT)
+BEGIN
+IF nombre IS NULL OR nombre = ''
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "nombre" es obligatorio';
+END IF;
+
+IF personas IS NULL
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "cantidadPersonas" es obligatorio';
+END IF;
+
+IF recetas IS NULL
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "cantidadRecetas" es obligatorio';
+END IF;
+
+IF personas <= 0 OR recetas <= 0 OR precio <= 0
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: La cantidad de personas, recetas o precio deben ser mayores a cero.';
+END IF;
+
+INSERT INTO productos (nombre, cantPersonas, cantRecetas, precio)
+VALUES (nombre, personas, recetas, precio);
+END
+//
