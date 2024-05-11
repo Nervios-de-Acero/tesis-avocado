@@ -230,6 +230,20 @@ controller.getRecetasFeed = (req, res) => {
     return;
 }
 
+controller.agregarReceta = (req, res) =>{
+
+    console.log('Se crea la receta');
+
+    funcionesComunes.manejoRespuestas(res,  {
+        errors: {
+            message: 'Todo OK.',
+        },
+        meta: {
+            status: 200,
+        },
+    });
+}
+  
 controller.crearProducto = (req, res) => {
     const nombre = req.body.nombre,
         cantPersonas = req.body.cantPersonas,
