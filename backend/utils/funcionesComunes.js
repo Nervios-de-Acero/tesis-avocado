@@ -24,7 +24,6 @@ funciones.manejoRespuestas = (res, datos) => {
  * @return {undefined}
  */
 funciones.validarJSON = (req, res, next) => {
-    console.log('request', req)
 const resValidaciones = validationResult(req).array()
 
 if(resValidaciones.length > 0){
