@@ -1,8 +1,6 @@
 const express = require('express')
 const http = require('http')
 const debug = require('debug')
-const session = require('express-session')
-const expressValidator = require('express-validator')
 const cors = require('cors')
 const createError = require('http-errors');
 const path = require('path');
@@ -24,7 +22,6 @@ app.set('view engine', 'ejs');
 const recetaRouter = require('./routes/receta')
 const usuarioRouter = require('./routes/usuario')
 const loginRouter = require('./routes/login')
-const logoutRouter = require('./routes/logout')
 const registroRouter = require('./routes/registro')
 const panelRouter = require('./routes/panel');
 const adminRouter = require('./routes/admin');
@@ -80,16 +77,6 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-//Sesión
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'claveSecreta',
-//   resave: true,
-//   saveUninitialized: false,
-//   cookie: {
-//     maxAge: null
-//   }
-// }))
-
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -105,7 +92,6 @@ app.use(cors());
 app.use('/receta', recetaRouter)
 app.use('/usuario', usuarioRouter)
 app.use('/login', loginRouter)
-app.use('/logout', logoutRouter)
 app.use('/registro', registroRouter)
 app.use('/panel', panelRouter);
 app.use('/admin', adminRouter);
