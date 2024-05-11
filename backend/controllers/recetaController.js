@@ -237,7 +237,7 @@ controller.crearProducto = (req, res) => {
         precio = req.body.precio;
 
         try {
-            db.query(`CALL sp_getRecetasFeed(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
+            db.query(`CALL sp_crearProducto(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
                 if (error) {
                     funcionesComunes.manejoRespuestas(res, {
                         errors: {
