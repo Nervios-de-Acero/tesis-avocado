@@ -8,20 +8,28 @@ textarea{
     resize: none;
 }
 
+.contenidoPrincipal{
+    height: 80vh;
+}
+
+.seccionInputs{
+    height: 75vh;
+}
+
 .title-container{
     display: block;
     max-width:fit-content;
-    border: 2px solid #ced4da;
-    border-radius: 0.25rem;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
+    border-bottom: 2px solid #ced4da;
+    border-radius: 3rem;
+    padding: 0.2rem;
+    margin-bottom: 10px;
     text-align: center;
     margin-left: auto;
     margin-right: auto;
 }
 
 .title-main{
-    font-size: 24px;
+    font-size: 18px;
 }
 
 .btnItem{
@@ -38,13 +46,18 @@ textarea{
     color:crimson;
 }
 
+.containerTextarea{
+    height: 40%;
+    margin-bottom: 1.5rem;
+}
+
 .textareaReceta{
-    min-height: 175px !important;
-    overflow-y: auto !important;
+    height: 90%;
+    overflow-y: auto;
 }
 
 .containerItems{
-    height: 390px !important;
+    min-height: 85%;
     overflow-y: auto;
     border: 1px solid #ced4da;
     border-radius: 0.25rem;

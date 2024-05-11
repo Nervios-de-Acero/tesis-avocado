@@ -230,6 +230,22 @@ controller.getRecetasFeed = (req, res) => {
     return;
 }
 
+
+
+controller.agregarReceta = (req, res) =>{
+
+    console.log('Se crea la receta');
+
+    funcionesComunes.manejoRespuestas(res,  {
+        errors: {
+            message: 'Todo OK.',
+        },
+        meta: {
+            status: 200,
+        },
+    });
+}
+
 //#endregion
 
 module.exports = controller;

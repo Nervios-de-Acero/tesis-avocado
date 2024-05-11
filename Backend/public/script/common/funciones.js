@@ -1,5 +1,4 @@
 const funcioneslistItems = {
-    listas: [],
     agregarItem: (e) =>{
 
         const elemento = e.target;
@@ -87,4 +86,25 @@ const funcioneslistItems = {
     },
 }
 
-export { funcioneslistItems };
+const funcionesPeticiones = {
+
+    enviarFormulario: async (url, formData, callback) =>{
+        
+        try{
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+    
+            callback(await response.status);
+            
+        } catch(error){
+    
+            console.log(error);
+        }
+    
+        return;
+    }
+}
+
+export { funcioneslistItems, funcionesPeticiones };

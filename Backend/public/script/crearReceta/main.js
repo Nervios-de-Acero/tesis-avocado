@@ -1,4 +1,4 @@
-import { funcioneslistItems } from '/script/common/funciones.js';
+import { funcioneslistItems, funcionesPeticiones } from '/script/common/funciones.js';
 
 //#region Variables
 
@@ -69,63 +69,21 @@ const validacionesSubmit = ()=>{
 
     let validacion = '';
 
-    if(errores.length > 0){
+    const val = {
+        "titulo": '\n-Título vacío',
+        "descripcion":'\n-Descripción vacía',
+        "ingredientes": '\n-Lista de ingredientes vacía',
+        "pasos": '\n-Lista de pasos vacía'
+      }
 
+    errores.forEach((error)=>{
 
-        errores.forEach((error)=>{
-
-            switch(error){
-
-                case 'titulo':
-                    
-                    validacion += '\n-Título vacío';
-                    break;
-
-                case 'descripcion':
-                    
-                    validacion += '\n-Descripción vacía';
-                    break;
-
-                case 'ingredientes':
-                    
-                    validacion += '\n-Lista de ingredientes vacía';
-                    break;
-
-                case 'pasos':
-
-                    validacion += '\n-Lista de pasos vacía';
-                    break;
-            }
-        });
-    } else{
-
-        validacion = '';
-    }
+        validacion += val[error];
+    });
 
     return validacion;
 }
 
-const enviarReceta = async (url, formData, callback) =>{
-
-    try{
-
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
-
-        if(await response.ok){
-
-            callback(await response);
-        }
-        
-    } catch(error){
-
-        console.log(error);
-    }
-
-    return;
-}
 //#endregion
 
 //#region Event Listeners
@@ -177,9 +135,9 @@ btnSubmit.addEventListener('click', (e) =>{
     formData.append('ingredientes', inputHiddenIngredientes.value);
     formData.append('pasos', inputHiddenPasos.value);
 
-    const url = './crearReceta';
+    const url = '../admin/agregarReceta';
 
-    enviarReceta(url, formData, async (response)=>{
+    funcionesPeticiones.enviarFormulario(url, formData, async (response)=>{
 
         console.log(await response);
     });

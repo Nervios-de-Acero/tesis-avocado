@@ -30,18 +30,6 @@ controller.renderCrearReceta = (req, res) => {
 
     res.render(`crearReceta`);
 }
-
-controller.agregarReceta = (req, res) =>{
-
-    funcionesComunes.manejoRespuestas(res,  {
-        data: {
-            message: 'Todo OK.',
-        },
-        meta: {
-            status: 200,
-        },
-    });
-}
 //#endregion
 
 module.exports = controller;
