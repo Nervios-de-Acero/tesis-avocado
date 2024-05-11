@@ -230,8 +230,6 @@ controller.getRecetasFeed = (req, res) => {
     return;
 }
 
-
-
 controller.agregarReceta = (req, res) =>{
 
     console.log('Se crea la receta');
@@ -244,6 +242,47 @@ controller.agregarReceta = (req, res) =>{
             status: 200,
         },
     });
+}
+  
+controller.crearProducto = (req, res) => {
+    const nombre = req.body.nombre,
+        cantPersonas = req.body.cantPersonas,
+        cantRecetas = req.body.cantRecetas,
+        precio = req.body.precio;
+
+        try {
+            db.query(`CALL sp_crearProducto(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
+                if (error) {
+                    funcionesComunes.manejoRespuestas(res, {
+                        errors: {
+                            message: error.message,
+                        },
+                        meta: {
+                            status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                        },
+                    });
+                } else {
+                    funcionesComunes.manejoRespuestas(res, {
+                        data: {
+                            message: 'Producto Creado correctamente'
+                        },
+                        meta: {
+                            status: 200,
+                        },
+                    });
+                }
+            });
+        } catch (error) {
+            funcionesComunes.manejoRespuestas(res, {
+                errors: {
+                    message: error.message,
+                },
+                meta: {
+                    status: 500,
+                },
+            });
+        }
+        return;
 }
 
 //#endregion

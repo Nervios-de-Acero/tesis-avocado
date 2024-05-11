@@ -1,8 +1,6 @@
 const express = require('express')
 const http = require('http')
 const debug = require('debug')
-const session = require('express-session')
-const expressValidator = require('express-validator')
 const cors = require('cors')
 const createError = require('http-errors');
 const path = require('path');
@@ -78,16 +76,6 @@ function onError(error) {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-//Sesión
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'claveSecreta',
-//   resave: true,
-//   saveUninitialized: false,
-//   cookie: {
-//     maxAge: null
-//   }
-// }))
 
 //Middlewares
 app.use(express.json());
