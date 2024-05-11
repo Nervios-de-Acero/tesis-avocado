@@ -1,5 +1,5 @@
 const funcioneslistItems = {
-    data: {},
+    listas: [],
     agregarItem: (e) =>{
 
         const elemento = e.target;
@@ -45,12 +45,15 @@ const funcioneslistItems = {
         <input class="btn btn-sm btn-secondary btnBorrarItem" type="button" value="X">
         `;
         
-        funcioneslistItems.data[tipoElemento].push(inputTexto.value);
+        const inputOculto = document.querySelector(`#inputHidden${tipoElemento}`);
+
+        let arrayItems = JSON.parse(inputOculto.value);
+        arrayItems.push(inputTexto.value);
+        inputOculto.value = JSON.stringify(arrayItems);
+
         inputTexto.value = '';
-    
+
         container.append(nuevoItem);
-    
-        return;
     },
     configurarContenedores: (e) =>{
     
@@ -70,8 +73,12 @@ const funcioneslistItems = {
                     const item = elemento.closest('.item');
                     const tipoElemento = item.dataset.itemTipo;
                     const idItem = itemsDelContenedor.indexOf(item);
-    
-                    funcioneslistItems.data[tipoElemento].splice(idItem, 1);
+                    inputHiddenIngredientes
+                    const inputOculto = document.querySelector(`#inputHidden${tipoElemento}`);
+                    
+                    let arrayItems = JSON.parse(inputOculto.value);
+                    arrayItems.splice(idItem, 1);
+                    inputOculto.value = JSON.stringify(arrayItems);
     
                     item.remove();
                 }

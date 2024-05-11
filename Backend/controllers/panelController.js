@@ -23,10 +23,7 @@ controller.renderizarExample = (req, res) => {
 
 controller.renderizarExampleSubmit = (req, res) => {
 
-    res.render(`exampleSubmit`, {
-
-        testResponse: req.body.testInput
-    });
+    res.render(`exampleSubmit`);
 }
 
 controller.renderCrearReceta = (req, res) => {
@@ -35,11 +32,15 @@ controller.renderCrearReceta = (req, res) => {
 }
 
 controller.agregarReceta = (req, res) =>{
-    
-    const response = JSON.parse(req.body.inputResponse)
 
-    console.log(response)
-    res.render(`crearReceta`);
+    funcionesComunes.manejoRespuestas(res,  {
+        data: {
+            message: 'Todo OK.',
+        },
+        meta: {
+            status: 200,
+        },
+    });
 }
 //#endregion
 

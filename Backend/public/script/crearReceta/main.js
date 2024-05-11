@@ -2,15 +2,7 @@ import { funcioneslistItems } from '/script/common/funciones.js';
 
 //#region Variables
 
-let data = {
-    titulo: '',
-    tiempoCoccion: 0,
-    dificultad: '',
-    imagen: '',
-    Descripcion: '',
-    Ingredientes: [],
-    Pasos: [],
-}
+let listas = [];
 
 //#endregion
 
@@ -28,7 +20,8 @@ const inputDificultad = document.getElementById('inputDificultad');
 const inputImagen = document.getElementById('inputImagen'); 
 const textareaDescripcion = document.getElementById('textareaDescripcion');
 
-const inputResponse = document.getElementById('inputResponse'); 
+const inputHiddenIngredientes = document.getElementById('inputHiddenIngredientes'); 
+const inputHiddenPasos = document.getElementById('inputHiddenPasos'); 
 
 const containerIngredientes = document.getElementById('containerIngredientes'); 
 const containerPasos = document.getElementById('containerPasos'); 
@@ -53,16 +46,13 @@ const validacionesSubmit = ()=>{
         errores.push('descripcion');
     }
 
-    const containers = document.querySelectorAll('.containerItems');
+    listas.forEach((lista)=>{
 
-    containers.forEach((container)=>{
-
-        const tipoElemento = container.id.slice(9);
-        const items = container.querySelector('.item');
+        const items = lista.container.querySelector('.item');
 
         if(!items){
 
-            switch(tipoElemento){
+            switch(lista.tipoElemento){
     
                 case 'Ingredientes':
     
@@ -115,14 +105,26 @@ const validacionesSubmit = ()=>{
     return validacion;
 }
 
-const enviarReceta = async (receta, url) =>{
+const enviarReceta = async (url, formData, callback) =>{
 
-    const response = await fetch(url, {
-        method: 'POST',
-        mode: 'same-origin'
-    });
+    try{
 
-    return responseParsed = await JSON.parse(response);
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if(await response.ok){
+
+            callback(await response);
+        }
+        
+    } catch(error){
+
+        console.log(error);
+    }
+
+    return;
 }
 //#endregion
 
@@ -130,7 +132,20 @@ const enviarReceta = async (receta, url) =>{
 
 window.addEventListener('load', (e) =>{
 
-    funcioneslistItems.data = data;
+    inputHiddenIngredientes.value = JSON.stringify([]);
+    inputHiddenPasos.value = JSON.stringify([]);
+
+    const containers = document.querySelectorAll('.containerItems');
+    containers.forEach((container)=>{
+
+        const tipoElemento = container.id.slice(9);
+        listas.push({
+            tipoElemento: tipoElemento,
+            container: container,
+        });
+    });
+
+
     funcioneslistItems.configurarContenedores();
 });
 
@@ -150,14 +165,24 @@ btnSubmit.addEventListener('click', (e) =>{
         return;
     }
 
-    data.titulo = inputTitulo.value;
-    data.tiempoCoccion = inputTiempoCoccion.value;
-    data.dificultad = inputDificultad.value;
-    data.imagen = inputImagen.value;
-    data.Descripcion = textareaDescripcion.value;
+    const containers = document.querySelectorAll('.containerItems');
 
-    inputResponse.value = JSON.stringify(data);
-    formReceta.submit();
+    const formData = new FormData();
+
+    formData.append('titulo', inputTitulo.value);
+    formData.append('tiempoCoccion', inputTiempoCoccion.value);
+    formData.append('dificultad', inputDificultad.value);
+    formData.append('imagen', inputImagen.value);
+    formData.append('descripcion', textareaDescripcion.value);
+    formData.append('ingredientes', inputHiddenIngredientes.value);
+    formData.append('pasos', inputHiddenPasos.value);
+
+    const url = './crearReceta';
+
+    enviarReceta(url, formData, async (response)=>{
+
+        console.log(await response);
+    });
 });
 
 inputIngredientes.addEventListener('keypress', funcioneslistItems.agregarItem)

@@ -24,7 +24,6 @@ app.set('view engine', 'ejs');
 const recetaRouter = require('./routes/receta')
 const usuarioRouter = require('./routes/usuario')
 const loginRouter = require('./routes/login')
-const logoutRouter = require('./routes/logout')
 const registroRouter = require('./routes/registro')
 const panelRouter = require('./routes/panel');
 const adminRouter = require('./routes/admin');
@@ -105,7 +104,6 @@ app.use(cors());
 app.use('/receta', recetaRouter)
 app.use('/usuario', usuarioRouter)
 app.use('/login', loginRouter)
-app.use('/logout', logoutRouter)
 app.use('/registro', registroRouter)
 app.use('/panel', panelRouter);
 app.use('/admin', adminRouter);

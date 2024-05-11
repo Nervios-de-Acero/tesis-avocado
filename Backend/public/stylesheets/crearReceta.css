@@ -64,13 +64,18 @@ textarea{
 
 .itemContenido{
     flex: 1;
-    max-width: 24em;
+    max-width: 94%;
     border-right: 1px solid #ced4da;
 }
 
 .btnBorrarItem{
     padding: 1px 5px 1px 5px;
+    min-width: 5%;
     margin-left: 5px;
     align-self:baseline;
     font-weight: 800;
+}
+
+.btnSubmit{
+    margin-bottom: 2em;
 }
