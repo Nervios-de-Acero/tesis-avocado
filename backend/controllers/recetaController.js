@@ -356,6 +356,7 @@ controller.getCategorias = (req, res) => {
         });
     }
 }
+
 //#endregion
 
 module.exports = controller;
