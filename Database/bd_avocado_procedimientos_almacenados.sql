@@ -384,3 +384,24 @@ INSERT INTO productos (nombre, cantPersonas, cantRecetas, precio)
 VALUES (nombre, personas, recetas, precio);
 END
 //
+
+DELIMITER //
+CREATE PROCEDURE `sp_getUsuario`(
+IN emailUser VARCHAR(200)
+)
+BEGIN
+IF (SELECT COUNT(*) FROM usuarios WHERE email = emailUser) > 0
+THEN
+SELECT email, contraseña, 
+CASE 
+	WHEN isAdmin = 1 
+    THEN TRUE
+    ELSE FALSE
+    END AS "isAdmin"
+FROM usuarios
+WHERE email = emailUser;
+ELSE
+SIGNAL SQLSTATE '45005'
+SET MESSAGE_TEXT = 'Usuario inexistente';
+END IF;
+END //
