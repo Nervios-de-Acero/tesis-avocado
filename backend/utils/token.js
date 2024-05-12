@@ -20,8 +20,7 @@ const tokenFunctions = {
     if (!accessToken) {
       return res.status(401).send({ errors: [{ status: '401', title: 'unauthorized', message: 'No autorizado' }] });
     }
-    const token = accessToken.split(' ')[1]; // Remover 'Bearer ' del encabezado de autorización
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(accessToken, process.env.JWT_SECRET, (err, user) => {
       if (err) {
         console.log(err);
         return res.status(401).send({ errors: [{ status: '401', title: 'unauthorized', message: 'Token expirado o incorrecto. Inicie sesión nuevamente' }] });
@@ -38,6 +37,13 @@ const tokenFunctions = {
     } else {
       return next();
     }
+  },
+  isAdmin: (req, res, next) => {
+    const accessToken = req.headers.authorization
+
+    const decoded = this.decodeToken(accessToken)
+    res.send(decoded)
+
   }
 };
 
