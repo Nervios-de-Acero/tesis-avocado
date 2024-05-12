@@ -243,7 +243,7 @@ controller.agregarReceta = (req, res) =>{
         },
     });
 }
-  
+
 controller.crearProducto = (req, res) => {
     const nombre = req.body.nombre,
         cantPersonas = req.body.cantPersonas,
@@ -285,6 +285,42 @@ controller.crearProducto = (req, res) => {
         return;
 }
 
+controller.getRecetaById = (req, res) => {
+    const idReceta = req.query.id;
+    try {
+        db.query(`CALL sp_getReceta(?);`,[idReceta], function(error, results) {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }})
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return; 
+    }
 //#endregion
 
 module.exports = controller;
