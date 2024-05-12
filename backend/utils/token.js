@@ -1,5 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const funcionesComunes = require('../utils/funcionesComunes')
 
 const tokenFunctions = {
   generateToken: (user) => {
@@ -39,11 +40,21 @@ const tokenFunctions = {
     }
   },
   isAdmin: (req, res, next) => {
-    const accessToken = req.headers.authorization
-
-    const decoded = this.decodeToken(accessToken)
-    res.send(decoded)
-
+    const token = req.headers.authorization
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.isAdmin) {
+      return next()
+    } else {
+      funcionesComunes.manejoRespuestas(res, {
+        errors: {
+          message: "Acceso restringido",
+        },
+        meta: {
+          status: 403,
+        },
+      });
+    }
+    return
   }
 };
 

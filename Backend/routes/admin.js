@@ -171,7 +171,7 @@ router.delete('/eliminarReceta/:id', (req, res) => {
     });
 });
 
-router.get('/testAdmin', funcionesToken.validateToken, funcionesToken.isAdmin)
+
 //#endregion
 
 module.exports = router;
