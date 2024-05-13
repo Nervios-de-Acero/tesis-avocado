@@ -15,6 +15,9 @@ router.route('/example')
 router.route('/crearReceta')
 .get(panelController.renderCrearReceta);
 
+router.route("/listaRecetas")
+.get(panelController.renderListaRecetas);
+
 //#region endpoints
 
 //#endregion

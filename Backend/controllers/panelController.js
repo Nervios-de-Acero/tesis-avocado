@@ -1,5 +1,6 @@
 const funcionesComunes = require('../utils/funcionesComunes');
 const funcionesToken = require('../utils/token');
+const db = require('../conection')
 
 const controller = {};
 
@@ -30,6 +31,24 @@ controller.renderCrearReceta = (req, res) => {
 
     res.render(`crearReceta`);
 }
+
+controller.renderListaRecetas = (req, res) => {
+    try {
+        db.query('CALL sp_getRecetasAdmin();', (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                data = results[0]
+                console.log(data)
+                res.render('listaRecetas', {data});
+            }
+        });
+    } catch (error) {
+        console.error(error)
+    }
+    
+    }
+
 //#endregion
 
 module.exports = controller;
