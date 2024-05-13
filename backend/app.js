@@ -101,6 +101,11 @@ app.use('/test', testRouter);
 
 
 //Error
+
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     res.status(400).json({ error: 'El cuerpo de la solicitud es demasiado grande' });
