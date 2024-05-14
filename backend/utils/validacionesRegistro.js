@@ -1,5 +1,9 @@
 const validaciones = {
   nombreCompleto: {
+    exists: {
+      errorMessage: "Formato inválido. Parámetro 'nombreCompleto' requerido.",
+      bail: true
+    },
     notEmpty: {
       errorMessage: 'Campo obligatorio',
       bail: true
@@ -10,6 +14,10 @@ const validaciones = {
     }
   },
   email: {
+    exists: {
+      errorMessage: "Formato inválido. Parámetro 'email' requerido.",
+      bail: true
+    },
     notEmpty: {
       errorMessage: 'Campo obligatorio',
       bail: true
@@ -19,6 +27,10 @@ const validaciones = {
     }
   },
   password: {
+    exists: {
+      errorMessage: "Formato inválido. Parámetro 'password' requerido.",
+      bail: true
+    },
     notEmpty: {
       errorMessage: 'Campo obligatorio',
       bail: true
@@ -36,6 +48,10 @@ const validaciones = {
     }
   },
   usuario: {
+    exists: {
+      errorMessage: "Formato inválido. Parámetro 'usuario' requerido.",
+      bail: true
+    },
     notEmpty: {
       errorMessage: 'Campo obligatorio',
       bail: true

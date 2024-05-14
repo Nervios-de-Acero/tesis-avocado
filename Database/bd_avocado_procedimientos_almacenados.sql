@@ -13,7 +13,6 @@ BEGIN
 END
 //
 
-/********************** SP REGISTRO ********************/
 DELIMITER //
 CREATE PROCEDURE `sp_registro`(
 IN userEmail VARCHAR(200), 
@@ -96,7 +95,7 @@ BEGIN
 			  WHERE rc.idReceta = idRequest
 			),
 			pasos AS (
-			  SELECT JSON_ARRAYAGG(JSON_OBJECT('idPaso',p.idPaso ,'titulo', p.titulo, 'descripcion', p.descripcion)) AS pasos
+			  SELECT JSON_ARRAYAGG(JSON_OBJECT('idPaso',p.idPaso, 'descripcion', p.descripcion)) AS pasos
 			  FROM pasos p
 			  INNER JOIN recetas r
 			  ON r.idReceta = p.idReceta
@@ -109,7 +108,7 @@ BEGIN
 			WHERE r.idReceta = idRequest
 			),
 			recetas AS (
-			SELECT r.idReceta, r.titulo, u.usuario AS creadoPor, u.email AS emailCreadoPor, r.tiempoCoccion, r.dificultad, CONVERT(r.imagen USING utf8mb4) AS imagen, 
+			SELECT r.idReceta, r.titulo, u.usuario AS creadoPor, u.email AS emailCreadoPor, r.tiempoCoccion, r.dificultad, r.imagen AS imagen, 
             r.fechaCreacion, r.fechaActualizacion, r.descripcion 
             FROM recetas r
             INNER JOIN usuarios u
@@ -119,7 +118,8 @@ BEGIN
 			SELECT * 
             FROM recetas, ingredientes, pasos, categorias;
 		ELSE
-			SELECT 'No hay registros' AS result;
+			SIGNAL SQLSTATE '45006'
+		    SET MESSAGE_TEXT = 'Error: Receta inexistente';
 	END IF;
 END
 //
@@ -162,7 +162,6 @@ END
 //
 
 
-/************************NUEVO SP CREAR RECETA***************************/
 DELIMITER //
 CREATE PROCEDURE "sp_crearReceta"(
 IN emailCreador VARCHAR(250), 
@@ -263,6 +262,7 @@ END //
 DELIMITER //
 CREATE PROCEDURE "sp_actualizarReceta" (
 IN idR INT, 
+IN tituloR VARCHAR(250),
 IN descripcionR TEXT, 
 IN tiempoCoccionR VARCHAR(20), 
 IN dificultadR VARCHAR(15),
@@ -288,6 +288,10 @@ BEGIN
     SIGNAL SQLSTATE '45004'
     SET MESSAGE_TEXT = 'Error: El valor de categoriasR no es un JSON válido';
     END IF;
+    
+    IF tituloR IS NOT NULL
+		THEN UPDATE recetas SET titulo = tituloR WHERE idReceta = idR;
+ 	END IF;
 
 	IF descripcionR IS NOT NULL
 		THEN UPDATE recetas SET descripcion = descripcionR WHERE idReceta = idR;
@@ -319,10 +323,85 @@ BEGIN
      
 	IF pasosR IS NOT NULL
 		THEN 
-			DELETE FROM ingredientes WHERE idReceta = idR;
+			DELETE FROM pasos WHERE idReceta = idR;
  			CALL sp_crearPasoIngredienteCategoria(idR, pasosR, 'pasos');
  	END IF;
     
 	UPDATE recetas SET fechaActualizacion = NOW();
 END
 //
+
+DELIMITER //
+CREATE PROCEDURE "sp_getRecetasFeed"(IN limite INT)
+BEGIN
+IF limite IS NULL
+	THEN
+	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
+	FROM recetas;
+ELSE 
+	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
+	FROM recetas
+	LIMIT limite;
+END IF;
+END
+//
+
+DELIMITER //
+CREATE PROCEDURE `sp_getProductos`()
+BEGIN
+SELECT * FROM productos;
+END
+//
+
+DELIMITER //
+CREATE PROCEDURE `sp_crearProducto`(IN nombre VARCHAR(150), IN personas INT, IN recetas INT, IN precio INT)
+BEGIN
+IF nombre IS NULL OR nombre = ''
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "nombre" es obligatorio';
+END IF;
+
+IF personas IS NULL
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "cantidadPersonas" es obligatorio';
+END IF;
+
+IF recetas IS NULL
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: El parámetro "cantidadRecetas" es obligatorio';
+END IF;
+
+IF personas <= 0 OR recetas <= 0 OR precio <= 0
+THEN
+	SIGNAL SQLSTATE '45005'
+	SET MESSAGE_TEXT = 'Error: La cantidad de personas, recetas o precio deben ser mayores a cero.';
+END IF;
+
+INSERT INTO productos (nombre, cantPersonas, cantRecetas, precio)
+VALUES (nombre, personas, recetas, precio);
+END
+//
+
+DELIMITER //
+CREATE PROCEDURE `sp_getUsuario`(
+IN emailUser VARCHAR(200)
+)
+BEGIN
+IF (SELECT COUNT(*) FROM usuarios WHERE email = emailUser) > 0
+THEN
+SELECT email, contraseña, 
+CASE 
+	WHEN isAdmin = 1 
+    THEN TRUE
+    ELSE FALSE
+    END AS "isAdmin"
+FROM usuarios
+WHERE email = emailUser;
+ELSE
+SIGNAL SQLSTATE '45005'
+SET MESSAGE_TEXT = 'Usuario inexistente';
+END IF;
+END //

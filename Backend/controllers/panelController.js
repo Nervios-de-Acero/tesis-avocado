@@ -23,12 +23,13 @@ controller.renderizarExample = (req, res) => {
 
 controller.renderizarExampleSubmit = (req, res) => {
 
-    res.render(`exampleSubmit`, {
-
-        testResponse: req.body.testInput
-    });
+    res.render(`exampleSubmit`);
 }
 
+controller.renderCrearReceta = (req, res) => {
+
+    res.render(`crearReceta`);
+}
 //#endregion
 
 module.exports = controller;

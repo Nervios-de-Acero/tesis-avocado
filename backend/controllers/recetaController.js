@@ -215,6 +215,9 @@ controller.crearProducto = (req, res) => {
 };
 
 controller.agregarReceta = (req, res) => {
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token);
+
     
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
@@ -264,4 +267,46 @@ controller.agregarReceta = (req, res) => {
         });
     }
 };
+
+controller.getRecetaById = (req, res) => {
+    // Obtener el ID de la receta de los parámetros de la solicitud
+    const idReceta = req.params.id;
+
+    // Realizar la consulta a la base de datos para obtener la receta por su ID
+    db.query(`CALL sp_getRecetaById(${idReceta})`, (error, results) => {
+        if (error) {
+            // Manejar el error si ocurre
+            funcionesComunes.manejoRespuestas(res, {
+                errors: {
+                    message: error,
+                },
+                meta: {
+                    status: 500,
+                },
+            });
+        } else if (results[0].length > 0) {
+            // Si se encuentra la receta, devolverla como respuesta
+            funcionesComunes.manejoRespuestas(res, {
+                data: {
+                    message: '',
+                    content: results[0][0], // Suponiendo que el resultado está en la primera posición del primer conjunto de resultados
+                },
+                meta: {
+                    status: 200,
+                },
+            });
+        } else {
+            // Si no se encuentra la receta, devolver un mensaje de error
+            funcionesComunes.manejoRespuestas(res, {
+                errors: {
+                    message: 'Receta no encontrada.',
+                },
+                meta: {
+                    status: 404,
+                },
+            });
+        }
+    });
+};
+
 module.exports = controller;
