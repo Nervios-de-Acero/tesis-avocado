@@ -27,22 +27,7 @@ router.put('/modificarReceta', funcionesToken.validateToken, recetaController.mo
 
 router.post('/crearProducto', funcionesToken.validateToken, checkSchema(productosValidaciones), funcionesComunes.validarJSON, recetaController.crearProducto)
 
-router.get('/getCategorias', (req, res) => {
-    db.query(`SELECT * FROM categorias;`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send({
-                success: true,
-                message: '',
-                content: results,
-            });
-        }
-    });
-});
+router.get('/getCategorias', recetaController.getCategorias);
 
 router.get('/getRecetasFeed', (req, res) => {
     db.query(

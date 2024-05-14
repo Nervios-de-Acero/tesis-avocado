@@ -231,7 +231,7 @@ controller.getRecetasFeed = (req, res) => {
 
 controller.agregarReceta = (req, res) =>{
 
-    console.log('Se crea la receta');
+    console.log(req.body);
 
     funcionesComunes.manejoRespuestas(res,  {
         errors: {

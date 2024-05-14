@@ -15,21 +15,21 @@
             </h1>
         </header>
         <main class ="row contenidoPrincipal">
-            <section class="col-md-4 seccionInputs">
+            <section class="col-md-3 seccionInputs">
                 <div class="form-group mb-1">
                     <label for="inputTitulo">
                         Titulo
                         <span class="obligatorio">*</span>
                     </label>
-                    <input type="text" class="form-control" name="txtTitulo" id="inputTitulo" placeholder="Empanada de JyQ sin queso">
+                    <input type="text" class="form-control" name="txtTitulo" id="inputTitulo" maxlength="250" placeholder="Empanada de JyQ sin queso">
                 </div>
                 <div class="form-group mb-1">
                     <label for="inputTiempoCoccion">Tiempo de cocción (min)</label>
-                    <input type="text" class="form-control" name="txtTiempoCoccion" id="inputTiempoCoccion" placeholder="420">
+                    <input type="text" class="form-control" name="txtTiempoCoccion" id="inputTiempoCoccion" maxlength="20" placeholder="420">
                 </div>
                 <div class="form-group mb-1">
                     <label for="inputDificultad">Dificultad</label>
-                    <input type="text" class="form-control" name="txtDificultad" id="inputDificultad" placeholder="0 (Pacifico)">
+                    <input type="text" class="form-control" name="txtDificultad" id="inputDificultad" maxlength="12" placeholder="0 (Pacifico)">
                 </div>
                 <div class="form-group mb-1">
                     <label for="inputImagen">Imagen (URL)</label>
@@ -46,7 +46,7 @@
                     <input class="btn btn-secondary" type="submit" id="btnSubmit" value="Submit">
                 </div>
             </section>
-            <section class="col-md-4 listaDesplegable">
+            <section class="col-md-3 listaDesplegable">
                 <div class="form-group mb-2">
                     <label for="inputIngredientes">
                         Ingredientes
@@ -61,7 +61,7 @@
                 </div>
                 <div class="containerItems" id="containerIngredientes"></div>
             </section>
-            <section class="col-md-4 listaDesplegable">
+            <section class="col-md-3 listaDesplegable">
                 <div class="form-group mb-2">
                     <label for="inputPasos">
                         Pasos
@@ -76,10 +76,27 @@
                 </div>
                 <div class="containerItems" id="containerPasos"></div>
             </section>
+            <section class="col-md-3 listaDesplegable">
+                <div class="form-group mb-2">
+                    <label for="inputCategorias">
+                        Categorias
+                        <span class="obligatorio">*</span>
+                    </label>
+                    <div class="input-group">
+                        <select type="text" class="form-control"  id="selectCategorias" >   
+                        </select>
+                        <div class="input-group-append">
+                            <input class="btn btn-dark btnItem" data-lista="true" type="button" id="btnCategorias" value="+"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="containerItems" id="containerCategorias"></div>
+            </section>
         </main>
         <aside>
             <input type="text" style="display: none;" id="inputHiddenIngredientes" name="txtIngredientes">
             <input type="text" style="display: none;" id="inputHiddenPasos" name="txtPasos">
+            <input type="text" style="display: none;" id="inputHiddenCategorias" name="txtCategorias">
         </aside>
     </form>
     <script type="module" src="/script/crearReceta/main.js"></script>

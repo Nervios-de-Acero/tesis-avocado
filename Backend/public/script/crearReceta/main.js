@@ -8,11 +8,13 @@ let listas = [];
 
 //#region Elementos DOM
 
-const btnSubmit = document.getElementById('btnSubmit'); 
-const btnPasos = document.getElementById('btnPasos'); 
 const btnIngredientes = document.getElementById('btnIngredientes'); 
+const btnCategorias = document.getElementById('btnCategorias'); 
+const btnPasos = document.getElementById('btnPasos'); 
+const btnSubmit = document.getElementById('btnSubmit'); 
 
 const inputIngredientes = document.getElementById('inputIngredientes'); 
+const selectCategorias = document.getElementById('selectCategorias'); 
 const inputPasos = document.getElementById('inputPasos'); 
 const inputTitulo = document.getElementById('inputTitulo'); 
 const inputTiempoCoccion = document.getElementById('inputTiempoCoccion'); 
@@ -22,9 +24,11 @@ const textareaDescripcion = document.getElementById('textareaDescripcion');
 
 const inputHiddenIngredientes = document.getElementById('inputHiddenIngredientes'); 
 const inputHiddenPasos = document.getElementById('inputHiddenPasos'); 
+const inputHiddenCategorias = document.getElementById('inputHiddenCategorias'); 
 
 const containerIngredientes = document.getElementById('containerIngredientes'); 
 const containerPasos = document.getElementById('containerPasos'); 
+const containerCategorias = document.getElementById('containerCategorias'); 
 
 const formReceta = document.getElementById('formReceta'); 
 
@@ -63,6 +67,11 @@ const validacionesSubmit = ()=>{
     
                     errores.push('pasos');
                     break;
+                
+                case 'Categorias':
+    
+                    errores.push('categorias');
+                    break;
             }
         }
     });
@@ -73,6 +82,7 @@ const validacionesSubmit = ()=>{
         "titulo": '\n-Título vacío',
         "descripcion":'\n-Descripción vacía',
         "ingredientes": '\n-Lista de ingredientes vacía',
+        "categorias": '\n-Lista de categorías vacía',
         "pasos": '\n-Lista de pasos vacía'
       }
 
@@ -84,6 +94,11 @@ const validacionesSubmit = ()=>{
     return validacion;
 }
 
+const getCategorias = () =>{
+
+
+}
+
 //#endregion
 
 //#region Event Listeners
@@ -92,6 +107,7 @@ window.addEventListener('load', (e) =>{
 
     inputHiddenIngredientes.value = JSON.stringify([]);
     inputHiddenPasos.value = JSON.stringify([]);
+    inputHiddenCategorias.value = JSON.stringify([]);
 
     const containers = document.querySelectorAll('.containerItems');
     containers.forEach((container)=>{
@@ -103,6 +119,22 @@ window.addEventListener('load', (e) =>{
         });
     });
 
+    const url = '../admin/getCategorias'
+    funcionesPeticiones.getDatos(url, null, (response)=>{
+
+        const arrayCategorias = response.content;
+        arrayCategorias.forEach((categoria) =>{
+
+
+            let nuevaOption = document.createElement('option');
+            nuevaOption.innerHTML = `<option>${categoria.idCategoria}-${categoria.nombre}</option>`
+            selectCategorias.append(nuevaOption);
+        });
+
+
+    });
+    
+    selectCategorias.selectedIndex = -1;
 
     funcioneslistItems.configurarContenedores();
 });
@@ -110,6 +142,8 @@ window.addEventListener('load', (e) =>{
 btnIngredientes.addEventListener('click', funcioneslistItems.agregarItem);
 
 btnPasos.addEventListener('click', funcioneslistItems.agregarItem);
+
+btnCategorias.addEventListener('click', funcioneslistItems.agregarItem);
 
 btnSubmit.addEventListener('click', (e) =>{
 
@@ -134,6 +168,7 @@ btnSubmit.addEventListener('click', (e) =>{
     formData.append('descripcion', textareaDescripcion.value);
     formData.append('ingredientes', inputHiddenIngredientes.value);
     formData.append('pasos', inputHiddenPasos.value);
+    formData.append('categorias', inputHiddenCategorias.value);
 
     const url = '../admin/agregarReceta';
 
