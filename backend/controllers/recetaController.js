@@ -229,19 +229,58 @@ controller.getRecetasFeed = (req, res) => {
     return;
 }
 
-controller.agregarReceta = (req, res) =>{
+controller.agregarReceta = (req, res) => {
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token)
+    
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
 
-    console.log('Se crea la receta');
+    const titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = req.body.ingredientes || null,
+        pasos = req.body.pasos || null,
+        imagen = req.body.imagen || null,
+        categorias = req.body.categorias || null;
 
-    funcionesComunes.manejoRespuestas(res,  {
-        errors: {
-            message: 'Todo OK.',
-        },
-        meta: {
-            status: 200,
-        },
-    });
-}
+    try {
+        db.query(`CALL sp_crearReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes),JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta creada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        console.error(error)
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Token de autenticación no proporcionado'
+            },
+            meta: {
+                status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+            },
+        });
+    }
+};
 
 controller.crearProducto = (req, res) => {
     const nombre = req.body.nombre,
