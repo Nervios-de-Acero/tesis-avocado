@@ -301,7 +301,7 @@ controller.getRecetaById = (req, res) => {
                 funcionesComunes.manejoRespuestas(res, {
                     data: {
                         message: '',
-                        content: results[0]
+                        content: results[0][0]
                     },
                     meta: {
                         status: 200,
