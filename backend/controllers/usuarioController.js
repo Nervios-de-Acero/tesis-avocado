@@ -1,9 +1,11 @@
 const db = require('../conection');
 const funcionesToken = require('../utils/token');
 const funcionesComunes = require('../utils/funcionesComunes');
-const tokenFunctions = require('../utils/token');
 const validacionesPassword = require('../utils/validacionesPassword'); // Importar el archivo de validaciones
 const { validationResult } = require('express-validator'); // Agregar la importación de validationResult
+const bcrypt = require('bcrypt');
+
+
 
 const controller = {};
 
@@ -75,123 +77,76 @@ controller.actualizarPerfil = (req, res) => {
     }
 };
 
-controller.modificarPassword = (req, res) => {
-    // Verificar el token
-    const token = req.headers.authorization;
-    if (!token) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Token de autenticación no proporcionado'
-            },
-            meta: {
-                status: 401
-            }
-        });
-        return;
-    }
 
-    try {
-        const decodedToken = tokenFunctions.verifyToken(token);
-        if (!decodedToken) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: 'Token de autenticación inválido'
-                },
-                meta: {
-                    status: 401
-                }
-            });
-            return;
-        }
 
-       // Validar los campos del formulario utilizando el esquema de validación
-       const errores = validacionesPassword.modificarPassword(req);
-       if (errores) {
-           funcionesComunes.manejoRespuestas(res, {
-               errors: errores,
-               meta: {
-                   status: 400
-               }
-           });
-           return;
-       }
+// controller.modificarPassword = (req, res) => {
 
-        if (resValidaciones.length > 0) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: 'Campos inválidos',
-                    result: resValidaciones
-                },
-                meta: {
-                    status: 400
-                }
-            });
-            return;
-        }
 
-        db.query(`SELECT contraseña FROM usuarios WHERE email = '${email}';`, function(error, results) {
-            if (error) {
-                funcionesComunes.manejoRespuestas(res, {
-                    errors: {
-                        message: error
-                    },
-                    meta: {
-                        status: 500
-                    }
-                });
-                return;
-            } else {
-                const resultado = results[0];
-                if (bcrypt.compareSync(pass, resultado.contraseña)) {
-                    db.query(`UPDATE usuarios SET contraseña = '${bcrypt.hashSync(nuevoPass, 12)}' WHERE email = '${email}';`, function(error, results) {
-                        if (error) {
-                            funcionesComunes.manejoRespuestas(res, {
-                                errors: {
-                                    message: error
-                                },
-                                meta: {
-                                    status: 500
-                                }
-                            });
-                            return;
-                        } else {
-                            funcionesComunes.manejoRespuestas(res, {
-                                data: {
-                                    message: 'Contraseña actualizada correctamente'
-                                },
-                                meta: {
-                                    status: 200
-                                }
-                            });
-                            return;
-                        }
-                    });
-                } else {
-                    funcionesComunes.manejoRespuestas(res, {
-                        errors: {
-                            message: 'La contraseña es incorrecta'
-                        },
-                        meta: {
-                            status: 400
-                        }
-                    });
-                    return;
-                }
-            }
-        });
+//     const pass = req.body.password;
+//     const nuevoPass = req.body.nuevoPassword;
+//     const token = req.headers.authorization;
+//     const userData = funcionesToken.decodeToken(token);
+//     const email = userData.email;
 
-    } catch (error) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Error al verificar el token'
-            },
-            meta: {
-                status: 500
-            }
-        });
-    }
-};
+//     try {
+//         db.query(`SELECT contraseña FROM usuarios WHERE email = '${email}';`, function (error, results) {
+//             if (error) {
+//                 funcionesComunes.manejoRespuestas(res, {
+//                     errors: {
+//                         message: error,
+//                     },
+//                     meta: {
+//                         status: 500,
+//                     },
+//                 });
+//                 return;
+//             } else {
+//                 const resultado = results[0];
+//                 if (bcrypt.compareSync(pass, resultado.contraseña)) {
+//                     db.query(`CALL sp_actualizarPerfil(NULL, NULL, NULL, NULL,  ' ${bcrypt.hashSync(nuevoPass, 12)}' );` , function (error, results) {
+//                         if (error) {
 
+//                             throw new Error(error)
+                        
+//                         } else {
+//                             funcionesComunes.manejoRespuestas(res, {
+//                                 error: {
+//                                     message: 'Contraseña actualizada correctamente',
+//                                 },
+//                                 meta: {
+//                                     status: 201,
+//                                 },
+//                             });
+//                             return;
+//                         }
+//                     });
+//                 } else {
+//                     funcionesComunes.manejoRespuestas(res, {
+//                         errors: {
+//                             message: 'La contraseña es incorrecta',
+//                         },
+//                         meta: {
+//                             status: 401,
+//                         },
+//                     });
+//                     return;
+//                 }
+//             }
+//         });
+//     } catch (error) {
+//         console.error(error)
+//         funcionesComunes.manejoRespuestas(res, {
+//             errors: {
+//                 message: error.message,
+//             },
+//             meta: {
+//                 status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+//             },
+//         });
+
+//         return;
+//     }
+// };
 module.exports = controller;
 
 

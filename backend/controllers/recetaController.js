@@ -1,8 +1,6 @@
 const db = require('../conection');
 const funcionesComunes = require('../utils/funcionesComunes');
 const funcionesToken = require('../utils/token');
-const { validationResult } = require('express-validator');
-const { validacionesRecetas } = require('../utils/validacionesRecetas');
 
 const controller = {};
 
@@ -11,7 +9,6 @@ const controller = {};
 controller.getRecetasUsuario = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token);
-    // const isAdmin =
 
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
@@ -28,23 +25,16 @@ controller.getRecetasUsuario = (req, res) => {
     try {
         db.query(`CALL sp_getRecetasUsuario('${email}')`, (error, results) => {
             if (error) {
-                //Se llama a la funcion manejoRespuestas() del objeto funcionesComunes para enviar la respuesta al front
-                //Se le pasa como primer parametro el res
-                //Se le pasa como segundo parametro el objeto formateado con la informacion a devolver
                 funcionesComunes.manejoRespuestas(res, {
-                    //Debe llevar la propiedad errors si es un error
                     errors: {
                         message: error,
                     },
-                    //Siempre debe llevar la propiedad meta
                     meta: {
-                        //La propiedad meta siempre debe tener la subpropiedad status inicializada (si o si valor numerico)
                         status: 400,
                     },
                 });
             } else if (results[0]) {
                 funcionesComunes.manejoRespuestas(res, {
-                    //Debe llevar la propiedad data si NO es un error
                     data: {
                         message: '',
                         content: results[0],
@@ -65,11 +55,9 @@ controller.getRecetasUsuario = (req, res) => {
                 });
             }
         });
-        //En el catch hacemos una respuesta de error si hay un error de la DB
     } catch (error) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
-                //Pasarle el error de catch en errors.message
                 message: error,
             },
             meta: {
@@ -77,67 +65,106 @@ controller.getRecetasUsuario = (req, res) => {
             },
         });
     }
-    return;
 };
 
 controller.modificarReceta = (req, res) => {
     const token = req.headers.authorization;
-    const email = funcionesToken.decodeToken(token)
-}
+    const email = funcionesToken.decodeToken(token);
 
-//#endregion
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
 
-controller.agregarReceta = (req, res) => {
-    // Verificar el token
-    const token = req.headers.authorization;
-    if (!token) {
+    const idR = req.body.idReceta || null,
+        titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = req.body.ingredientes || null,
+        pasos = req.body.pasos || null,
+        imagen = req.body.imagen || null,
+        categorias = req.body.categorias || null;
+
+    try {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), JSON.stringify(categorias), imagen], (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta actualizada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
                 message: 'Token de autenticación no proporcionado'
             },
             meta: {
-                status: 401
+                status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+            },
+        });
+    }
+};
+
+controller.getProductos = (req, res) => {
+    try {
+        db.query(`CALL sp_getProductos();`, (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
             }
         });
-        return;
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
     }
+};
+
+controller.crearProducto = (req, res) => {
+    const nombre = req.body.nombre,
+        cantPersonas = req.body.cantPersonas,
+        cantRecetas = req.body.cantRecetas,
+        precio = req.body.precio;
 
     try {
-        const decodedToken = tokenFunctions.verifyToken(token);
-        if (!decodedToken) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: 'Token de autenticación inválido'
-                },
-                meta: {
-                    status: 401
-                }
-            });
-            return;
-        }
-
-        const resValidaciones = validationResult(req).array();
-        if (resValidaciones.length > 0) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: 'Campos inválidos',
-                    content: resValidaciones
-                },
-                meta: {
-                    status: 400
-                }
-            });
-            return;
-        }
-
-        const categorias = req.body.categorias ? `'${JSON.stringify(req.body.categorias)}'` : null;
-        const tiempoCoccion = req.body.tiempoCoccion ? `'${req.body.tiempoCoccion}'` : null;
-        const dificultad = req.body.dificultad ? `'${req.body.dificultad}'` : null;
-
         db.query(
-            `CALL sp_crearReceta('${req.body.titulo}', '${req.body.email}', ${tiempoCoccion}, ${dificultad}, '${
-                req.body.descripcion
-            }', '${req.body.imagen}', '${JSON.stringify(req.body.ingredientes)}', '${JSON.stringify(req.body.pasos)}', ${categorias});`,
+            `CALL sp_crearReceta('${req.body.titulo}', '${req.body.email}', ${tiempoCoccion}, ${dificultad}, '${req.body.descripcion}', '${req.body.imagen}', '${JSON.stringify(req.body.ingredientes)}', '${JSON.stringify(req.body.pasos)}', ${categorias});`,
             (error, results) => {
                 if (error) {
                     funcionesComunes.manejoRespuestas(res, {
@@ -187,4 +214,54 @@ controller.agregarReceta = (req, res) => {
     }
 };
 
+controller.agregarReceta = (req, res) => {
+    
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
+
+    const idR = req.body.idReceta || null,
+        titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = req.body.ingredientes || null,
+        pasos = req.body.pasos || null,
+        imagen = req.body.imagen || null,
+        categorias = req.body.categorias || null;
+
+    try {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes),JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta creada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Token de autenticación no proporcionado'
+            },
+            meta: {
+                status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+            },
+        });
+    }
+};
 module.exports = controller;

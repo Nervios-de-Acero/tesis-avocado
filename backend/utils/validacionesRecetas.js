@@ -1,5 +1,3 @@
-const { checkSchema } = require('express-validator');
-
 const validaciones = {
   titulo: {
     notEmpty: {
@@ -84,6 +82,4 @@ const validaciones = {
   }
 }
 
-module.exports = {
-  validacionesRecetas: checkSchema(validaciones)
-};
+module.exports = validaciones

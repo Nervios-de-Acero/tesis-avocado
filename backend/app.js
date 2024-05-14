@@ -1,7 +1,6 @@
 const express = require('express')
 const http = require('http')
 const debug = require('debug')
-const session = require('express-session')
 const expressValidator = require('express-validator')
 const cors = require('cors')
 const createError = require('http-errors');
