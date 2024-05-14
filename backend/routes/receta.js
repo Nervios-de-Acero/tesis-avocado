@@ -72,22 +72,7 @@ router.post('/agregarReceta', checkSchema(validacion), (req, res) => {
     );
 });
 
-router.get('/getCategorias', (req, res) => {
-    db.query(`SELECT * FROM categorias;`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send({
-                success: true,
-                message: '',
-                content: results,
-            });
-        }
-    });
-});
+router.get('/getCategorias', recetaController.getCategorias);
 
 router.get('/getRecetasFeed', recetaController.getRecetasFeed);
 
@@ -111,20 +96,7 @@ router.get('/buscarReceta/:titulo', (req, res) => {
     });
 });
 
-router.get('/getRecetaById/:id', (req, res) => {
-    const idReceta = req.params.id;
-    db.query(`CALL sp_getReceta(${idReceta});`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send(results[0][0]);
-            return;
-        }
-    });
-});
+router.get('/getRecetaById', recetaController.getRecetaById);
 
 router.get('/getRecetasUsuario/:email', funcionesToken.validateToken, recetaController.getRecetasUsuario);
 
