@@ -21,7 +21,7 @@ const recetaController = require('../controllers/recetaController');
 
 //#region Rutas
 
-router.post('/agregarReceta', upload.none(), recetaController.agregarReceta);
+router.post('/agregarReceta',funcionesToken.validateToken, checkSchema(validacion),recetaController.agregarReceta)  
 
 router.put('/modificarReceta', funcionesToken.validateToken, recetaController.modificarReceta)
 
