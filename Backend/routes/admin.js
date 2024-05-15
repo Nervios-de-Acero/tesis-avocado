@@ -116,6 +116,7 @@ router.delete('/eliminarReceta/:id', (req, res) => {
                     success: false,
                     message: 'No hay recetas con ese ID',
                 });
+                console.log('test')
             } else {
                 res.send({
                     success: true,
@@ -128,7 +129,7 @@ router.delete('/eliminarReceta/:id', (req, res) => {
 
 router.post('/eliminarProducto/:id', funcionesToken.validateToken, recetaController.eliminarProducto);
 
-router.post('/eliminarReceta/:id', funcionesToken.validateToken, recetaController.eliminarProducto);
+router.post('/eliminarReceta/:id', funcionesToken.validateToken, recetaController.eliminarReceta);
 
 //#endregion
 
