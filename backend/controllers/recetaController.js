@@ -434,6 +434,46 @@ controller.eliminarProducto = (req, res) => {
     }
 }
 
+
+controller.eliminarReceta = (req, res) => {
+    const idRP = req.params.id || null;
+    try {
+        db.query(`CALL sp_eliminarRecetaProducto(?,?)`, [idRP, 'receta'], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+}
+
+
+
 //#endregion
 
 module.exports = controller;
