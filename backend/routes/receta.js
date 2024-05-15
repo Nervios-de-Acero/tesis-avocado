@@ -21,23 +21,23 @@ router.get('/getRecetasFeed', recetaController.getRecetasFeed);
 
 router.get('/getProductos', recetaController.getProductos)
 
-router.get('/buscarReceta/:titulo', (req, res) => {
-    const titulo = req.params.titulo;
-    db.query(`CALL sp_buscarReceta('${titulo}');`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send({
-                success: true,
-                message: '',
-                content: results[0],
-            });
-        }
-    });
-});
+// router.get('/buscarReceta/:titulo', (req, res) => {
+//     const titulo = req.params.titulo;
+//     db.query(`CALL sp_buscarReceta('${titulo}');`, function (error, results) {
+//         if (error) {
+//             res.send({
+//                 success: false,
+//                 message: error,
+//             });
+//         } else {
+//             res.send({
+//                 success: true,
+//                 message: '',
+//                 content: results[0],
+//             });
+//         }
+//     });
+// });
 
 router.get('/getRecetaById', recetaController.getRecetaById);
 

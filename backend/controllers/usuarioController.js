@@ -6,53 +6,21 @@ const funcionesComunes = require('../utils/funcionesComunes');
 const controller = {};
 
 controller.actualizarPerfil = (req, res) => {
-    const resValidaciones = validationResult(req).array();
     const nombreCompleto = req.body.nombreCompleto || null;
     const usuario = req.body.usuario || null;
-    const imagen = req.body.imagen || null;
+    // const imagen = req.body.imagen || null; -- Se remueve para una futura integración
 
-    const token = req.headers.token;
+    const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token);
-
-    if (!email) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Error. Email obligatorio.',
-            },
-            meta: {
-                status: 401,
-            },
-        });
-        return;
-    }
-
-    if (resValidaciones.length > 0) {
-        funcionesComunes.manejoRespuestas(res, {
-            errors: {
-                message: 'Campos inválidos',
-                content: resValidaciones,
-            },
-            meta: {
-                status: 406,
-            },
-        });
-        return;
-    }
+    console.log(email)
 
     try {
-        db.query(`CALL sp_actualizarPerfil('${email}', '${nombreCompleto}', '${imagen}', '${usuario}');`, function (error, results) {
+        db.query(`CALL sp_actualizarPerfil(?, ?, NULL, ?, NULL);`, [email, nombreCompleto, usuario], function (error, results) {
             if (error) {
-                funcionesComunes.manejoRespuestas(res, {
-                    errors: {
-                        message: error,
-                    },
-                    meta: {
-                        status: 400,
-                    },
-                });
+                throw new Error(error)
             } else {
                 funcionesComunes.manejoRespuestas(res, {
-                    error: {
+                    data: {
                         message: 'Se actualizaron los datos correctamente',
                     },
                     meta: {
@@ -62,12 +30,13 @@ controller.actualizarPerfil = (req, res) => {
             }
         });
     } catch (error) {
+        console.error(error)
         funcionesComunes.manejoRespuestas(res, {
             errors: {
-                message: error,
+                message: error.message,
             },
             meta: {
-                status: 500,
+                status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
             },
         });
     }
