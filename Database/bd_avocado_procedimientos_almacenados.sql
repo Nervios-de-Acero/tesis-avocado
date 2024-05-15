@@ -394,7 +394,7 @@ IN emailUser VARCHAR(200)
 BEGIN
 IF (SELECT COUNT(*) FROM usuarios WHERE email = emailUser) > 0
 THEN
-SELECT email, contraseña, 
+SELECT email, contraseña, nombreCompleto, usuario, imagen,
 CASE 
 	WHEN isAdmin = 1 
     THEN TRUE
