@@ -49,6 +49,16 @@ controller.renderListaRecetas = (req, res) => {
     
     }
 
+controller.renderEditarReceta = (req, res) => {
+
+    res.send('Estás en Editar receta');
+}
+
+controller.renderAgregarReceta = (req, res) => {
+
+    res.send('Estás en agregar receta');
+}
+
 //#endregion
 
 module.exports = controller;

@@ -53,8 +53,8 @@
                 <td><%= item.creador %></td>
                 <td><%= item.fechaCreacion %></td>
                 <td>
-                    <a class="btn" href="/panel/detalle/<%= item.idReceta %>">Editar</a>
-                    <a class="btn" href="/panel/eliminar/<%= item.idReceta %>">Eliminar</a>
+                    <a class="btn" href="/panel/editarReceta?id=<%= item.idReceta %>">Editar</a>
+                    <a class="btn" href="/admin/eliminarReceta/<%= item.idReceta %>">Eliminar</a>
                 </td>
             </tr>
         <% }); %>
