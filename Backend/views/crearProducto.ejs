@@ -12,7 +12,11 @@
     <%- include('../views/partials/navbar.ejs') %>
 
     <h1>Ingresa los datos</h1>
-    <form action="/admin/crearProducto" method="post">
+    <form
+      id="formularioCrearProducto"
+      action="/admin/crearProducto"
+      method="post"
+    >
       <div>
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required />
@@ -31,5 +35,6 @@
       </div>
       <button type="submit">Enviar</button>
     </form>
+    <script type="module" src="/script/crearProducto/main.js"></script>
   </body>
 </html>
