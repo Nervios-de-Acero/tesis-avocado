@@ -13,7 +13,7 @@ const tokenFunctions = {
       return decoded.email;
     } catch (error) {
       console.error('Error al decodificar el token:', error);
-      return null;
+      return res.status(401).send({ errors: [{ status: '401', title: 'unauthorized', message: 'Token expirado o incorrecto. Inicie sesión nuevamente' }] });
     }
   },
   validateToken: (req, res, next) => {
