@@ -201,7 +201,7 @@ controller.getRecetasFeed = (req, res) => {
                         message: error.message,
                     },
                     meta: {
-                        status:  500,
+                        status: 500,
                     },
                 });
             } else {
@@ -232,7 +232,7 @@ controller.getRecetasFeed = (req, res) => {
 controller.agregarReceta = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token)
-    
+
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
@@ -255,7 +255,7 @@ controller.agregarReceta = (req, res) => {
         categorias = req.body.categorias || null;
 
     try {
-        db.query(`CALL sp_crearReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes),JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
+        db.query(`CALL sp_crearReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes), JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
             if (error) {
                 throw new Error(error)
             } else {
@@ -288,45 +288,45 @@ controller.crearProducto = (req, res) => {
         cantRecetas = req.body.cantRecetas,
         precio = req.body.precio;
 
-        try {
-            db.query(`CALL sp_crearProducto(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
-                if (error) {
-                    funcionesComunes.manejoRespuestas(res, {
-                        errors: {
-                            message: error.message,
-                        },
-                        meta: {
-                            status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
-                        },
-                    });
-                } else {
-                    funcionesComunes.manejoRespuestas(res, {
-                        data: {
-                            message: 'Producto Creado correctamente'
-                        },
-                        meta: {
-                            status: 200,
-                        },
-                    });
-                }
-            });
-        } catch (error) {
-            funcionesComunes.manejoRespuestas(res, {
-                errors: {
-                    message: error.message,
-                },
-                meta: {
-                    status: 500,
-                },
-            });
-        }
-        return;
+    try {
+        db.query(`CALL sp_crearProducto(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Producto Creado correctamente'
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
 }
 
 controller.getRecetaById = (req, res) => {
     const idReceta = req.query.id;
     try {
-        db.query(`CALL sp_getReceta(?);`,[idReceta], function(error, results) {
+        db.query(`CALL sp_getReceta(?);`, [idReceta], function (error, results) {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {
@@ -346,7 +346,8 @@ controller.getRecetaById = (req, res) => {
                         status: 200,
                     },
                 });
-            }})
+            }
+        })
     } catch (error) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {
@@ -357,12 +358,12 @@ controller.getRecetaById = (req, res) => {
             },
         });
     }
-    return; 
-    }
+    return;
+}
 
 controller.getCategorias = (req, res) => {
     try {
-        db.query(`SELECT * FROM categorias;`, function(error, results) {
+        db.query(`SELECT * FROM categorias;`, function (error, results) {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {
@@ -382,7 +383,45 @@ controller.getCategorias = (req, res) => {
                         status: 200,
                     },
                 });
-            }})
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+}
+
+controller.eliminarProducto = (req, res) => {
+    const idRP = req.params.id || null;
+    try {
+        db.query(`CALL sp_eliminarRecetaProducto(?,?)`, [idRP, 'producto'], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
     } catch (error) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {

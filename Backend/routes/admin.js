@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { checkSchema, validationResult } = require('express-validator');
+const {
+    checkSchema,
+    validationResult
+} = require('express-validator');
 const validacion = require('../utils/validacionesRecetas');
 const funcionesToken = require('../utils/token');
 const multer = require('multer');
@@ -21,7 +24,7 @@ const recetaController = require('../controllers/recetaController');
 
 //#region Rutas
 
-router.post('/agregarReceta',funcionesToken.validateToken, checkSchema(validacion),recetaController.agregarReceta)  
+router.post('/agregarReceta', funcionesToken.validateToken, checkSchema(validacion), recetaController.agregarReceta)
 
 router.put('/modificarReceta', funcionesToken.validateToken, recetaController.modificarReceta)
 
@@ -123,6 +126,7 @@ router.delete('/eliminarReceta/:id', (req, res) => {
     });
 });
 
+router.get('/eliminarProducto/:id', funcionesToken.validateToken, recetaController.eliminarProducto);
 
 //#endregion
 
