@@ -179,9 +179,9 @@ controller.getProductos = (req, res) => {
 
 controller.getRecetasFeed = (req, res) => {
 
-    const limite = Number(req.query.limite) || null
-    // if(limite && Number.isNaN(limite)){
-    //     console.log(Number.isInteger(limite))
+    const categoria = Number(req.query.categoria) || null
+    // if(categoria && Number.isNaN(categoria)){
+    //     console.log(Number.isInteger(categoria))
     //     funcionesComunes.manejoRespuestas(res, {
     //         errors: {
     //             message: 'Error: El límite debe ser un número entero. ',
@@ -194,7 +194,7 @@ controller.getRecetasFeed = (req, res) => {
     // }
 
     try {
-        db.query(`CALL sp_getRecetasFeed(?);`, [limite], (error, results) => {
+        db.query(`CALL sp_getRecetasFeed(?);`, [categoria], (error, results) => {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {
