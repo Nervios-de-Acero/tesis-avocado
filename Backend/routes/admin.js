@@ -127,9 +127,9 @@ router.delete('/eliminarReceta/:id', (req, res) => {
     });
 });
 
-router.post('/eliminarProducto/:id', funcionesToken.validateToken, recetaController.eliminarProducto);
+router.post('/eliminarProducto/:id', funcionesToken.isAdmin, recetaController.eliminarProducto);
 
-router.post('/eliminarReceta/:id', funcionesToken.validateToken, recetaController.eliminarReceta);
+router.post('/eliminarReceta/:id', funcionesToken.isAdmin, recetaController.eliminarReceta);
 
 //#endregion
 
