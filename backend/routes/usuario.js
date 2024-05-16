@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const { checkSchema } = require('express-validator');
-const validaciones = require('../utils/validacionesPerfil');
+const validacionesActualizarPerfil = require('../utils/validacionesActualizarPerfil');
 const validacionesPass = require('../utils/validacionesPassword');
+const funcionesComunes = require('../utils/funcionesComunes')
 const funcionesToken = require('../utils/token');
 
 //#region Controllers
@@ -33,7 +34,7 @@ router.get('/getUsuario/:email', (req, res) => {
     });
 });
 
-router.put('/actualizarPerfil', funcionesToken.validateToken, checkSchema(validaciones), usuarioController.actualizarPerfil);
+router.put('/actualizarPerfil', funcionesToken.validateToken, checkSchema(validacionesActualizarPerfil), funcionesComunes.validarJSON, usuarioController.actualizarPerfil);
 
 router.put('/modificarPassword', checkSchema(validacionesPass), (req, res) => {
     const resValidaciones = validationResult(req).array();
@@ -89,26 +90,6 @@ router.put('/modificarPassword', checkSchema(validacionesPass), (req, res) => {
     });
 });
 
-router.put('/actualizarImagen', (req, res) => {
-    if (!req.body.imagen || !req.body.email) {
-        res.status(400).json('Error. Imagen y mail obligatorios.');
-        return;
-    }
-    db.query(`UPDATE usuarios SET imagen = '${req.body.imagen}' WHERE email = '${req.body.email}'`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-            return;
-        } else {
-            res.send({
-                success: true,
-                message: 'Imagen actualizada',
-            });
-        }
-    });
-});
 
 router.delete('/eliminar', (req, res) => {
     const email = req.body.email;

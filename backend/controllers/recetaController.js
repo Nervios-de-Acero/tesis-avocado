@@ -80,6 +80,402 @@ controller.getRecetasUsuario = (req, res) => {
     return;
 };
 
+controller.modificarReceta = (req, res) => {
+
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token);
+
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
+
+    const idR = req.body.idReceta || null,
+        titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = JSON.parse(req.body.ingredientes) || null,
+        pasos = JSON.parse(req.body.pasos) || null,
+        categorias = JSON.parse(req.body.categorias) || null,
+        imagen = req.body.imagen || null;
+
+    try {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), JSON.stringify(categorias), imagen], (error, results) => {
+
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta actualizada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.getProductos = (req, res) => {
+    try {
+        db.query(`CALL sp_getProductos();`, (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.getRecetasFeed = (req, res) => {
+
+    const categoria = Number(req.query.categoria) || null
+    // if(categoria && Number.isNaN(categoria)){
+    //     console.log(Number.isInteger(categoria))
+    //     funcionesComunes.manejoRespuestas(res, {
+    //         errors: {
+    //             message: 'Error: El límite debe ser un número entero. ',
+    //         },
+    //         meta: {
+    //             status:  400,
+    //         },
+    //     })
+    //     return
+    // }
+
+    try {
+        db.query(`CALL sp_getRecetasFeed(?);`, [categoria], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.agregarReceta = (req, res) => {
+    const token = req.headers.authorization;
+    const email = funcionesToken.decodeToken(token)
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
+
+    const titulo = req.body.titulo || null,
+        descripcion = req.body.descripcion || null,
+        tiempoCoccion = req.body.tiempoCoccion || null,
+        dificultad = req.body.dificultad || null,
+        ingredientes = JSON.parse(req.body.ingredientes) || null,
+        pasos = JSON.parse(req.body.pasos) || null,
+        imagen = req.body.imagen || null,
+        categorias = JSON.parse(req.body.categorias) || null;
+
+    try {
+        db.query(`CALL sp_crearReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes), JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Receta creada correctamente',
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        console.error(error)
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Token de autenticación no proporcionado'
+            },
+            meta: {
+                status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+            },
+        });
+    }
+};
+
+controller.crearProducto = (req, res) => {
+    const nombre = req.body.nombre,
+        cantPersonas = req.body.cantPersonas,
+        cantRecetas = req.body.cantRecetas,
+        precio = req.body.precio;
+
+    try {
+        db.query(`CALL sp_crearProducto(?, ?, ?, ?);`, [nombre, cantPersonas, cantRecetas, precio], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: 'Producto Creado correctamente'
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.getRecetaById = (req, res) => {
+    const idReceta = req.query.id;
+    try {
+        db.query(`CALL sp_getReceta(?);`, [idReceta], function (error, results) {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results[0][0]
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+}
+
+controller.getCategorias = (req, res) => {
+    try {
+        db.query(`SELECT * FROM categorias;`, function (error, results) {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+}
+
+controller.eliminarProducto = (req, res) => {
+    const idRP = req.params.id || null;
+    try {
+        db.query(`CALL sp_eliminarRecetaProducto(?,?)`, [idRP, 'producto'], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+}
+
+
+controller.eliminarReceta = (req, res) => {
+    const idRP = req.params.id || null;
+    try {
+        db.query(`CALL sp_eliminarRecetaProducto(?,?)`, [idRP, 'receta'], (error, results) => {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error.message,
+                    },
+                    meta: {
+                        status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
+                    },
+                });
+            } else {
+                funcionesComunes.manejoRespuestas(res, {
+                    data: {
+                        message: '',
+                        content: results
+                    },
+                    meta: {
+                        status: 200,
+                    },
+                });
+            }
+        })
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error.message,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+}
+
+
+
 //#endregion
 
 module.exports = controller;
