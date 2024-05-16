@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../views/partials/head.ejs') %>
+    <link rel="stylesheet" href="/stylesheets/crearReceta.css" type="text/css">
+    <script src="../utils/validacionesPassword.js"></script> 
+    <script>
+        // Validación del formulario
+        function validarFormulario() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var nuevoPassword = document.getElementById("nuevoPassword").value;
+
+            // Verificar si el campo de correo electrónico está vacío o no es válido
+            if (!email || !email.match(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)) {
+                alert("Por favor, ingrese un correo electrónico válido.");
+                return false;
+            }
+
+            // Verificar si el campo de contraseña está vacío o no es válida
+            if (!password || !validaciones.password.notEmpty || !validaciones.password.isStrongPassword) {
+                alert("Por favor, ingrese una contraseña válida (mínimo 8 caracteres y al menos un número y un carácter especial).");
+                return false;
+            }
+
+            // Verificar si el campo de nuevoPassword está vacío o no es válida
+            if (!nuevoPassword || !validaciones.nuevoPassword.notEmpty || !validaciones.nuevoPassword.isStrongPassword) {
+                alert("Por favor, ingrese una nueva contraseña válida (mínimo 8 caracteres y al menos un número y un carácter especial).");
+                return false;
+            }
+
+            // Si todas las validaciones pasan, se envía el formulario
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <form class="container-fluid contenidoPrincipal" name="formLogin" id="formLogin" action="/panel/login" method="POST" onsubmit="return validarFormulario()">
+        <header class="row title-container mt-2">
+            <h1 class="text-center title-main">
+                Login de Administrador
+            </h1>
+        </header>
+        <main class ="row contenidoPrincipal">
+            <section class="col-md-4 seccionInputs">
+                <div class="form-group mb-1">
+                    <label for="email">
+                        Email
+                        <span class="obligatorio">*</span>
+                    </label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group mb-1">
+                    <label for="password">Contraseña</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <input class="btn btn-secondary" type="submit" id="btnSubmit" value="Iniciar sesión">
+                </div>
+                <div class="form-group">
+                    <a style= "display: none" href="/registro" class="btn btn-primary">Registro</a>
+                </div>
+            </section>
+        </main>
+    </form>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../views/partials/head.ejs') %>
+    <link rel="stylesheet" href="/stylesheets/crearReceta.css" type="text/css">
+    <script src="../utils/validacionesPassword.js"></script> 
+    <script>
+        // Validación del formulario
+        function validarFormulario() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var nuevoPassword = document.getElementById("nuevoPassword").value;
+
+            // Verificar si el campo de correo electrónico está vacío o no es válido
+            if (!email || !email.match(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)) {
+                alert("Por favor, ingrese un correo electrónico válido.");
+                return false;
+            }
+
+            // Verificar si el campo de contraseña está vacío o no es válida
+            if (!password || !validaciones.password.notEmpty || !validaciones.password.isStrongPassword) {
+                alert("Por favor, ingrese una contraseña válida (mínimo 8 caracteres y al menos un número y un carácter especial).");
+                return false;
+            }
+
+            // Verificar si el campo de nuevoPassword está vacío o no es válida
+            if (!nuevoPassword || !validaciones.nuevoPassword.notEmpty || !validaciones.nuevoPassword.isStrongPassword) {
+                alert("Por favor, ingrese una nueva contraseña válida (mínimo 8 caracteres y al menos un número y un carácter especial).");
+                return false;
+            }
+
+            // Si todas las validaciones pasan, se envía el formulario
+            return true;
+        }
+    </script>
+</head>
+
+<body>
+    <form class="container-fluid contenidoPrincipal" name="formLogin" id="formLogin" action="/panel/inicio" method="POST" onsubmit="return validarFormulario()">
+        <header class="row title-container mt-2">
+            <h1 class="text-center title-main">
+                Login de Administrador
+            </h1>
+        </header>
+        <main class ="row contenidoPrincipal">
+            <section class="col-md-4 seccionInputs">
+                <div class="form-group mb-1">
+                    <label for="email">
+                        Email
+                        <span class="obligatorio">*</span>
+                    </label>
+                    <input type="email" class="form-control" name="email" id="email" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group mb-1">
+                    <label for="password">Contraseña</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <input class="btn btn-secondary" type="submit" id="btnSubmit" value="Iniciar sesión">
+                </div>
+                <div class="form-group">
+                    <a style= "display: none" href="/registro" class="btn btn-primary">Registro</a>
+                </div>
+            </section>
+        </main>
+    </form>
+</body>
+</html> -->
+

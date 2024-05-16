@@ -6,27 +6,126 @@ const funcionesComunes = require('../utils/funcionesComunes');
 const controller = {};
 
 controller.actualizarPerfil = (req, res) => {
+    const resValidaciones = validationResult(req).array();
     const nombreCompleto = req.body.nombreCompleto || null;
     const usuario = req.body.usuario || null;
-    // const imagen = req.body.imagen || null; -- Se remueve para una futura integración
+    const imagen = req.body.imagen || null;
 
-    const token = req.headers.authorization;
+    const token = req.headers.token;
     const email = funcionesToken.decodeToken(token);
-    console.log(email)
+
+    if (!email) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Error. Email obligatorio.',
+            },
+            meta: {
+                status: 401,
+            },
+        });
+        return;
+    }
+
+    if (resValidaciones.length > 0) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: 'Campos inválidos',
+                content: resValidaciones,
+            },
+            meta: {
+                status: 406,
+            },
+        });
+        return;
+    }
 
     try {
-        db.query(`CALL sp_actualizarPerfil(?, ?, NULL, ?, NULL);`, [email, nombreCompleto, usuario], function (error, results) {
+        db.query(`CALL sp_actualizarPerfil('${email}', '${nombreCompleto}', '${imagen}', '${usuario}');`, function (error, results) {
             if (error) {
-                throw new Error(error)
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error,
+                    },
+                    meta: {
+                        status: 400,
+                    },
+                });
             } else {
                 funcionesComunes.manejoRespuestas(res, {
-                    data: {
+                    error: {
                         message: 'Se actualizaron los datos correctamente',
                     },
                     meta: {
                         status: 201,
                     },
                 });
+            }
+        });
+    } catch (error) {
+        funcionesComunes.manejoRespuestas(res, {
+            errors: {
+                message: error,
+            },
+            meta: {
+                status: 500,
+            },
+        });
+    }
+    return;
+};
+
+controller.modificarPassword = (req, res) => {
+
+
+    const pass = req.body.password;
+    const nuevoPass = req.body.nuevoPassword;
+    const token = req.headers.authorization;
+    const userData = funcionesToken.decodeToken(token);
+    const email = userData.email;
+
+    try {
+        db.query(`SELECT contraseña FROM usuarios WHERE email = '${email}';`, function (error, results) {
+            if (error) {
+                funcionesComunes.manejoRespuestas(res, {
+                    errors: {
+                        message: error,
+                    },
+                    meta: {
+                        status: 500,
+                    },
+                });
+                return;
+            } else {
+                const resultado = results[0];
+                if (bcrypt.compareSync(pass, resultado.contraseña)) {
+                    db.query(`CALL sp_actualizarPerfil(NULL, NULL, NULL, NULL,  ' ${bcrypt.hashSync(nuevoPass, 12)}' );` , function (error, results) {
+                        if (error) {
+
+                            throw new Error(error)
+                        
+                        } else {
+                            funcionesComunes.manejoRespuestas(res, {
+                                error: {
+                                    message: 'Contraseña actualizada correctamente',
+                                },
+                                meta: {
+                                    status: 201,
+                                },
+                            });
+                            return;
+                        }
+                    });
+                } else {
+                    funcionesComunes.manejoRespuestas(res, {
+                        errors: {
+                            message: 'La contraseña es incorrecta',
+                        },
+                        meta: {
+                            status: 401,
+                        },
+                    });
+                    return;
+                }
             }
         });
     } catch (error) {
@@ -39,8 +138,8 @@ controller.actualizarPerfil = (req, res) => {
                 status: error.code === 'ER_SIGNAL_EXCEPTION' && error.errno === 1644 ? 409 : 500,
             },
         });
-    }
-    return;
-};
 
+        return;
+    }
+};
 module.exports = controller;
