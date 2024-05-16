@@ -18,11 +18,9 @@ router.route('/crearReceta')
 router.route("/listaRecetas")
 .get(panelController.renderListaRecetas);
 
-router.route('/editarReceta')
-.get(panelController.renderEditarReceta);
+router.route('/listaProductos')
+.get(panelController.renderListaProductos);
 
-router.route('/eliminarReceta')
-.get(panelController.renderEliminarReceta);
 
 //#region endpoints
 

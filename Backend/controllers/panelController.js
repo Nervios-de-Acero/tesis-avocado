@@ -54,10 +54,24 @@ controller.renderEditarReceta = (req, res) => {
     res.send('Estás en Editar receta');
 }
 
-controller.renderAgregarReceta = (req, res) => {
+controller.renderListaProductos = (req, res) => {
 
-    res.send('Estás en agregar receta');
+    try {
+        db.query('CALL sp_getProductos();', (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                data = results[0]
+                console.log(data)
+                res.render('listaProductos', {data});
+            }
+        });
+    } catch (error) {
+        console.error(error)
+    }
+    
 }
+
 
 //#endregion
 

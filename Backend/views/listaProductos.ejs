@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lista de Recetas</title>
+    <title>Lista de Productos</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -31,35 +31,39 @@
             text-decoration: none;
             display: inline-block;
             border-radius: 4px;
+            margin: 3px;
         }
         .btn:hover {
             background-color: #ddd;
             color: black;
         }
+
     </style>
 </head>
 <body>
     <%- include('../views/partials/navbar.ejs') %>
-    <h1>Lista de Recetas</h1>
+    <h1>Lista de Productos</h1>
+    <a class="btn" href="/panel/crearProducto">Agregar Nuevo</a>
     <table>
         <tr>
-            <th>Titulo</th>
-            <th>Creador</th>
-            <th>Fecha de creación</th>
+            <th>Nombre</th>
+            <th>Cantidad de personas</th>
+            <th>Cantidad de recetas</th>
+            <th>Precio</th>
             <th>Acciones</th>
         </tr>
         <% data.forEach(function(item) { %>
             <tr>
-                <td><%= item.titulo %></td>
-                <td><%= item.creador %></td>
-                <td><%= item.fechaCreacion %></td>
+                <td><%= item.nombre %></td>
+                <td><%= item.cantPersonas %></td>
+                <td><%= item.cantRecetas %></td>
+                <td><%= item.precio %></td>
                 <td>
-                    <a class="btn" href="/panel/editarReceta?id=<%= item.idReceta %>">Editar</a>
-                    <a class="btn" href="/admin/eliminarReceta/<%= item.idReceta %>">Eliminar</a>
+                    <a class="btn" href="/panel/editarProducto?id=<%= item.idProducto %>">Editar</a>
+                    <a class="btn" href="/admin/eliminarProducto/<%= item.idProducto %>">Eliminar</a>
                 </td>
             </tr>
         <% }); %>
     </table>
-    <a class="btn" href="/panel/crearReceta">Agregar Nuevo</a>
 </body>
 </html>
