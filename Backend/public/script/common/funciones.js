@@ -106,19 +106,39 @@ const funcioneslistItems = {
 
         container.append(nuevoItem);
     },
-    agregarItemManual: (itemDato, tipoElemento) =>{
+    agregarItemManual: (itemDato, tipoElemento, tipoEntrada) =>{
 
         //Datos Importantes
     
         const container = document.querySelector(`#container${tipoElemento}`);
 
         //Nuevo Elemento
-        const idNuevoItem = container.querySelectorAll('.item').length;
     
         let nuevoItem = document.createElement('div');
         nuevoItem.classList.add('item');
         nuevoItem.dataset.itemTipo = tipoElemento;
-        nuevoItem.dataset.itemId = idNuevoItem;
+        
+        //Se crea array con elementos a enviar
+        
+        const inputOculto = document.querySelector(`#inputHidden${tipoElemento}`);
+
+        let arrayItems = JSON.parse(inputOculto.value);
+
+        //Se consiguen los datos a enviar
+        if(tipoEntrada === 'select'){
+
+            const idNuevoItemSelect = parseInt(itemDato.slice(0, itemDato.indexOf('-')));
+            nuevoItem.dataset.itemId = idNuevoItemSelect;
+            arrayItems.push(idNuevoItemSelect);
+            console.log(arrayItems)
+        } else{
+
+            const idNuevoItem = container.querySelectorAll('.item').length;
+            nuevoItem.dataset.itemId = idNuevoItem;
+            arrayItems.push(itemDato);
+        }
+
+        //Se crea item en el DOM
         
         nuevoItem.innerHTML = `
         <div class="itemContenido">${itemDato}</div>
@@ -126,12 +146,7 @@ const funcioneslistItems = {
         `;
         
         //Guardamos los cambios
-        const inputOculto = document.querySelector(`#inputHidden${tipoElemento}`);
-
-        //Se agrega el dato al input oculto
-        let arrayItems = [];
-
-        arrayItems.push(itemDato);
+        console.log(inputOculto)
         
         inputOculto.value = JSON.stringify(arrayItems);
 
@@ -171,14 +186,16 @@ const funcioneslistItems = {
 
 const funcionesPeticiones = {
 
-    enviarFormulario: async (url, formData, callback)=>{
+    enviarFormulario: async (url, formData, metodo, callback)=>{
         
         try{
+
+            const token = localStorage.getItem('authorization');
             const response = await fetch(url, {
-                method: 'POST',
+                method: metodo,
                 body: formData,
                 headers:{
-                    authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1YW5AZXhhbXBsZS5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzE1ODE3NjQ1LCJleHAiOjE3MTU4MjEyNDV9.U8QNPkwilMKcxcgg_MtC9vQFCwj_vTdEX4IMLKKYBHA',
+                    authorization: token,
                 }
             });
     
@@ -189,6 +206,10 @@ const funcionesPeticiones = {
             console.log(error);
         }
     
+        const token = 'Aca iria el token, como sea que lo asignes...';
+
+        localStorage.setItem('authorization', token);
+
         return;
     },
     getDatos: async (url, callback)=>{

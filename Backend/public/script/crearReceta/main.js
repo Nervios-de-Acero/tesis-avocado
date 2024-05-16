@@ -112,12 +112,13 @@ const getCategorias = (categorias) =>{
 window.addEventListener('load', (e) =>{
 
     let url;
+    
+    inputHiddenIngredientes.value = JSON.stringify([]);
+    inputHiddenPasos.value = JSON.stringify([]);
+    inputHiddenCategorias.value = JSON.stringify([]);
 
     if(datosConfig.modo === 'Agregar'){
         
-        inputHiddenIngredientes.value = JSON.stringify([]);
-        inputHiddenPasos.value = JSON.stringify([]);
-        inputHiddenCategorias.value = JSON.stringify([]);
         url = '../../admin/getCategorias'
     } else{
 
@@ -134,12 +135,12 @@ window.addEventListener('load', (e) =>{
 
             datosReceta.ingredientes.forEach((receta) =>{
 
-                funcioneslistItems.agregarItemManual(receta, 'Ingredientes');
+                funcioneslistItems.agregarItemManual(receta, 'Ingredientes', 'input');
             });
 
             datosReceta.pasos.forEach((paso) =>{
 
-                funcioneslistItems.agregarItemManual(paso, 'Pasos');
+                funcioneslistItems.agregarItemManual(paso, 'Pasos', 'input');
             });
 
             //filtramos
@@ -162,7 +163,7 @@ window.addEventListener('load', (e) =>{
 
                 const formatoCategoria = categoria.idCategoria + '-' + categoria.nombre
 
-                funcioneslistItems.agregarItemManual(formatoCategoria, 'Categorias');
+                funcioneslistItems.agregarItemManual(formatoCategoria, 'Categorias', 'select');
             });
         });
 
@@ -226,16 +227,19 @@ btnSubmit.addEventListener('click', (e) =>{
     }
 
     let url;
+    let metodo;
 
     if(datosConfig.modo === 'Agregar'){
 
         url = '../../admin/agregarReceta';
+        metodo = 'POST';
     } else if(datosConfig.modo === 'Editar'){
         
         url = '../../../admin/modificarReceta';
+        metodo = 'PUT'
     }
 
-    funcionesPeticiones.enviarFormulario(url, formData, async (response)=>{
+    funcionesPeticiones.enviarFormulario(url, formData, metodo, async (response)=>{
 
         switch(response.satus){
 

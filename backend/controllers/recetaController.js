@@ -81,8 +81,9 @@ controller.getRecetasUsuario = (req, res) => {
 };
 
 controller.modificarReceta = (req, res) => {
+
     const token = req.headers.authorization;
-    const email = funcionesToken.decodeToken(token)
+    const email = funcionesToken.decodeToken(token);
 
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
@@ -101,12 +102,13 @@ controller.modificarReceta = (req, res) => {
         descripcion = req.body.descripcion || null,
         tiempoCoccion = req.body.tiempoCoccion || null,
         dificultad = req.body.dificultad || null,
-        ingredientes = req.body.ingredientes || null,
-        pasos = req.body.pasos || null,
+        ingredientes = JSON.parse(req.body.ingredientes) || null,
+        pasos = JSON.parse(req.body.pasos) || null,
+        categorias = JSON.parse(req.body.categorias) || null,
         imagen = req.body.imagen || null;
 
     try {
-        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, NULL, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), imagen], (error, results) => {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), JSON.stringify(categorias), imagen], (error, results) => {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {
@@ -248,10 +250,10 @@ controller.agregarReceta = (req, res) => {
         descripcion = req.body.descripcion || null,
         tiempoCoccion = req.body.tiempoCoccion || null,
         dificultad = req.body.dificultad || null,
-        ingredientes = req.body.ingredientes || null,
-        pasos = req.body.pasos || null,
+        ingredientes = JSON.parse(req.body.ingredientes) || null,
+        pasos = JSON.parse(req.body.pasos) || null,
         imagen = req.body.imagen || null,
-        categorias = req.body.categorias || null;
+        categorias = JSON.parse(req.body.categorias) || null;
 
     try {
         db.query(`CALL sp_crearReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [email, titulo, tiempoCoccion, dificultad, descripcion, imagen, JSON.stringify(ingredientes), JSON.stringify(pasos), JSON.stringify(categorias)], (error, results) => {
