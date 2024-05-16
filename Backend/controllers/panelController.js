@@ -6,7 +6,6 @@ const controller = {};
 //#region Controllers
 
 controller.renderizarExample = (req, res) => {
-    
     // Ejemplo de como sacar parametros de la query:
     //
     // Ej: localhost:3008/panel/example?parametro=13
@@ -53,6 +52,11 @@ controller.renderCargarReceta = (req, res) => {
     }
 
 }
+
+controller.renderCrearProducto = (req, res) => {
+    res.render(`crearProducto`);
+}
+
 //#endregion
 
 module.exports = controller;

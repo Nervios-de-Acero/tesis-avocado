@@ -109,6 +109,7 @@ controller.modificarReceta = (req, res) => {
 
     try {
         db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, ?, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), JSON.stringify(categorias), imagen], (error, results) => {
+
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {
