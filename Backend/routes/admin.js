@@ -24,28 +24,13 @@ const recetaController = require('../controllers/recetaController');
 
 //#region Rutas
 
-router.post('/agregarReceta', funcionesToken.validateToken, checkSchema(validacion), recetaController.agregarReceta)
+router.post('/agregarReceta',funcionesToken.validateToken, checkSchema(validacion), upload.none(), recetaController.agregarReceta)  
 
-router.put('/modificarReceta', funcionesToken.validateToken, recetaController.modificarReceta)
+router.put('/modificarReceta', funcionesToken.validateToken, checkSchema(validacion), upload.none(), recetaController.modificarReceta)
 
 router.post('/crearProducto', funcionesToken.validateToken, checkSchema(productosValidaciones), funcionesComunes.validarJSON, recetaController.crearProducto)
 
-router.get('/getCategorias', (req, res) => {
-    db.query(`SELECT * FROM categorias;`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send({
-                success: true,
-                message: '',
-                content: results,
-            });
-        }
-    });
-});
+router.get('/getCategorias', recetaController.getCategorias);
 
 router.get('/getRecetasFeed', (req, res) => {
     db.query(
@@ -85,20 +70,7 @@ router.get('/buscarReceta/:titulo', (req, res) => {
     });
 });
 
-router.get('/getRecetaById/:id', (req, res) => {
-    const idReceta = req.params.id;
-    db.query(`CALL sp_getReceta(${idReceta});`, function (error, results) {
-        if (error) {
-            res.send({
-                success: false,
-                message: error,
-            });
-        } else {
-            res.send(results[0][0]);
-            return;
-        }
-    });
-});
+router.get('/getRecetaById', recetaController.getRecetaById);
 
 router.get('/getRecetasUsuario/:email', funcionesToken.validateToken, recetaController.getRecetasUsuario);
 
