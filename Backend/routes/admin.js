@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { checkSchema, validationResult } = require('express-validator');
+const {
+    checkSchema,
+    validationResult
+} = require('express-validator');
 const validacion = require('../utils/validacionesRecetas');
 const funcionesToken = require('../utils/token');
 const multer = require('multer');
@@ -21,7 +24,7 @@ const recetaController = require('../controllers/recetaController');
 
 //#region Rutas
 
-router.post('/agregarReceta',funcionesToken.validateToken, checkSchema(validacion),recetaController.agregarReceta)  
+router.post('/agregarReceta', funcionesToken.validateToken, checkSchema(validacion), recetaController.agregarReceta)
 
 router.put('/modificarReceta', funcionesToken.validateToken, recetaController.modificarReceta)
 
@@ -98,6 +101,7 @@ router.delete('/eliminarReceta/:id', (req, res) => {
                     success: false,
                     message: 'No hay recetas con ese ID',
                 });
+                console.log('test')
             } else {
                 res.send({
                     success: true,
@@ -108,6 +112,9 @@ router.delete('/eliminarReceta/:id', (req, res) => {
     });
 });
 
+router.post('/eliminarProducto/:id', funcionesToken.isAdmin, recetaController.eliminarProducto);
+
+router.post('/eliminarReceta/:id', funcionesToken.isAdmin, recetaController.eliminarReceta);
 
 //#endregion
 
