@@ -103,10 +103,11 @@ controller.modificarReceta = (req, res) => {
         dificultad = req.body.dificultad || null,
         ingredientes = req.body.ingredientes || null,
         pasos = req.body.pasos || null,
+        categorias = req.body.categorias || null,
         imagen = req.body.imagen || null;
 
     try {
-        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, NULL, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), imagen], (error, results) => {
+        db.query(`CALL sp_actualizarReceta(?, ? , ? , ? , ?, ?, ?, NULL, ?)`, [idR, titulo, descripcion, tiempoCoccion, dificultad, JSON.stringify(pasos), JSON.stringify(ingredientes), JSON.stringify(categorias), imagen], (error, results) => {
             if (error) {
                 funcionesComunes.manejoRespuestas(res, {
                     errors: {

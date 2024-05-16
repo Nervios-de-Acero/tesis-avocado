@@ -24,6 +24,7 @@ controller.login = async (req, res) => {
       } else {
         // Verificar si la contraseña es válida
         const user = results[0][0]
+        console.log(user)
         try {
           const validPassword = await bcrypt.compare(password, user.contraseña);
           if (!validPassword) {
@@ -39,11 +40,15 @@ controller.login = async (req, res) => {
           } else {
             // Generar token JWT
             const token = tokenFunctions.generateToken({ email: user.email, isAdmin: !!user.isAdmin });
-            // Enviar el token como respuesta
+            delete user.isAdmin
+            delete user.contraseña
+
+            // Enviar el token e info de usuario como respuesta
             funcionesComunes.manejoRespuestas(res, {
               data: {
                 message: 'Sesión iniciada',
-                token
+                token,
+                user
               },
               meta: {
                 status: 200
