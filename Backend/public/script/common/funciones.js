@@ -190,7 +190,8 @@ const funcionesPeticiones = {
         
         try{
 
-            const token = localStorage.getItem('authorization');
+            //const token = localStorage.getItem('authorization');
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1YW5AZXhhbXBsZS5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzE1ODk3MDc3LCJleHAiOjE3MTU5MDA2Nzd9.NprpTAJE9CHAP1Wa7MLQ49pvZEooHnjkK_M39ypi0gU'
             const response = await fetch(url, {
                 method: metodo,
                 body: formData,
@@ -200,9 +201,11 @@ const funcionesPeticiones = {
             });
     
             callback(await response);
+            alert('Receta cargada')
             
         } catch(error){
-    
+            
+            alert('Receta no cargada')
             console.log(error);
         }
     
