@@ -243,8 +243,11 @@ btnSubmit.addEventListener('click', (e) =>{
 
         switch(response.satus){
 
+
             case 200:
-                alert(response.message);
+
+                alert('Receta cargada')
+                //alert(response.message);
                 
                 if(datosConfig.modo === 'Agregar'){
 
@@ -257,16 +260,20 @@ btnSubmit.addEventListener('click', (e) =>{
                 funcionesPeticiones.getDatos(url)
                 break;
             case 401:
-                alert(response.message);
+                alert('Receta no cargada')
+                //alert(response.message);
                 break;
             case 409:
-                alert(response);
+                alert('Receta no cargada')
+                //alert(response);
                 break;
             case 500:
-                alert(response);
+                alert('Receta no cargada')
+                //alert(response);
                 break;
             default:
-                alert(response);
+                alert('Receta no cargada')
+                //alert(response);
                 break;
         }
     });
