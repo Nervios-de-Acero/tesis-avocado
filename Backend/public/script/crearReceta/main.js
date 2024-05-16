@@ -8,11 +8,13 @@ let listas = [];
 
 //#region Elementos DOM
 
-const btnSubmit = document.getElementById('btnSubmit'); 
-const btnPasos = document.getElementById('btnPasos'); 
 const btnIngredientes = document.getElementById('btnIngredientes'); 
+const btnCategorias = document.getElementById('btnCategorias'); 
+const btnPasos = document.getElementById('btnPasos'); 
+const btnSubmit = document.getElementById('btnSubmit'); 
 
 const inputIngredientes = document.getElementById('inputIngredientes'); 
+const selectCategorias = document.getElementById('selectCategorias'); 
 const inputPasos = document.getElementById('inputPasos'); 
 const inputTitulo = document.getElementById('inputTitulo'); 
 const inputTiempoCoccion = document.getElementById('inputTiempoCoccion'); 
@@ -22,9 +24,11 @@ const textareaDescripcion = document.getElementById('textareaDescripcion');
 
 const inputHiddenIngredientes = document.getElementById('inputHiddenIngredientes'); 
 const inputHiddenPasos = document.getElementById('inputHiddenPasos'); 
+const inputHiddenCategorias = document.getElementById('inputHiddenCategorias'); 
 
 const containerIngredientes = document.getElementById('containerIngredientes'); 
 const containerPasos = document.getElementById('containerPasos'); 
+const containerCategorias = document.getElementById('containerCategorias'); 
 
 const formReceta = document.getElementById('formReceta'); 
 
@@ -63,6 +67,11 @@ const validacionesSubmit = ()=>{
     
                     errores.push('pasos');
                     break;
+                
+                case 'Categorias':
+    
+                    errores.push('categorias');
+                    break;
             }
         }
     });
@@ -73,6 +82,7 @@ const validacionesSubmit = ()=>{
         "titulo": '\n-Título vacío',
         "descripcion":'\n-Descripción vacía',
         "ingredientes": '\n-Lista de ingredientes vacía',
+        "categorias": '\n-Lista de categorías vacía',
         "pasos": '\n-Lista de pasos vacía'
       }
 
@@ -84,14 +94,81 @@ const validacionesSubmit = ()=>{
     return validacion;
 }
 
+const getCategorias = (categorias) =>{
+
+    const arrayCategorias = categorias.content;
+    arrayCategorias.forEach((categoria) =>{
+
+        let nuevaOption = document.createElement('option');
+        nuevaOption.innerHTML = `<option>${categoria.idCategoria}-${categoria.nombre}</option>`
+        selectCategorias.append(nuevaOption);
+    });
+}
+
 //#endregion
 
 //#region Event Listeners
 
 window.addEventListener('load', (e) =>{
 
+    let url;
+    
     inputHiddenIngredientes.value = JSON.stringify([]);
     inputHiddenPasos.value = JSON.stringify([]);
+    inputHiddenCategorias.value = JSON.stringify([]);
+
+    if(datosConfig.modo === 'Agregar'){
+        
+        url = '../../admin/getCategorias'
+    } else{
+
+        url = `../../../admin/getRecetaById?id=${datosConfig.idReceta}`;
+        funcionesPeticiones.getDatos(url, (response) =>{
+
+            const datosReceta = response.content;
+
+            inputTitulo.value = datosReceta.titulo;
+            inputTiempoCoccion.value = datosReceta.tiempoCoccion;
+            inputDificultad.value = datosReceta.dificultad;
+            inputImagen.value = datosReceta.imagen;
+            textareaDescripcion.value = datosReceta.descripcion
+
+            datosReceta.ingredientes.forEach((receta) =>{
+
+                funcioneslistItems.agregarItemManual(receta, 'Ingredientes', 'input');
+            });
+
+            datosReceta.pasos.forEach((paso) =>{
+
+                funcioneslistItems.agregarItemManual(paso, 'Pasos', 'input');
+            });
+
+            //filtramos
+
+            let categoriasFiltradas = [];
+            datosReceta.categorias.forEach((categoria, index, array) =>{
+                
+                if(categoriasFiltradas.length > 0){
+
+                    if (categoriasFiltradas.some(catFiltrada => catFiltrada.idCategoria === categoria.idCategoria)) {
+                        
+                        return;
+                    }
+                }
+
+                categoriasFiltradas.push(categoria);
+            });
+
+            categoriasFiltradas.forEach((categoria) =>{
+
+                const formatoCategoria = categoria.idCategoria + '-' + categoria.nombre
+
+                funcioneslistItems.agregarItemManual(formatoCategoria, 'Categorias', 'select');
+            });
+        });
+
+        url = '../../../admin/getCategorias';
+    }
 
     const containers = document.querySelectorAll('.containerItems');
     containers.forEach((container)=>{
@@ -103,6 +180,12 @@ window.addEventListener('load', (e) =>{
         });
     });
 
+    funcionesPeticiones.getDatos(url, (response)=>{
+
+        getCategorias(response);
+    });
+    
+    selectCategorias.selectedIndex = -1;
 
     funcioneslistItems.configurarContenedores();
 });
@@ -110,6 +193,8 @@ window.addEventListener('load', (e) =>{
 btnIngredientes.addEventListener('click', funcioneslistItems.agregarItem);
 
 btnPasos.addEventListener('click', funcioneslistItems.agregarItem);
+
+btnCategorias.addEventListener('click', funcioneslistItems.agregarItem);
 
 btnSubmit.addEventListener('click', (e) =>{
 
@@ -134,12 +219,56 @@ btnSubmit.addEventListener('click', (e) =>{
     formData.append('descripcion', textareaDescripcion.value);
     formData.append('ingredientes', inputHiddenIngredientes.value);
     formData.append('pasos', inputHiddenPasos.value);
+    formData.append('categorias', inputHiddenCategorias.value);
 
-    const url = '../admin/agregarReceta';
+    if(datosConfig.modo === 'Editar'){
 
-    funcionesPeticiones.enviarFormulario(url, formData, async (response)=>{
+        formData.append('idReceta', datosConfig.idReceta)
+    }
 
-        console.log(await response);
+    let url;
+    let metodo;
+
+    if(datosConfig.modo === 'Agregar'){
+
+        url = '../../admin/agregarReceta';
+        metodo = 'POST';
+    } else if(datosConfig.modo === 'Editar'){
+        
+        url = '../../../admin/modificarReceta';
+        metodo = 'PUT'
+    }
+
+    funcionesPeticiones.enviarFormulario(url, formData, metodo, async (response)=>{
+
+        switch(response.satus){
+
+            case 200:
+                alert(response.message);
+                
+                if(datosConfig.modo === 'Agregar'){
+
+                    url = '../agregarReceta';
+                } else if(datosConfig.modo === 'Editar'){
+                    
+                    url = '../../modificarReceta';
+                }
+                
+                funcionesPeticiones.getDatos(url)
+                break;
+            case 401:
+                alert(response.message);
+                break;
+            case 409:
+                alert(response);
+                break;
+            case 500:
+                alert(response);
+                break;
+            default:
+                alert(response);
+                break;
+        }
     });
 });
 

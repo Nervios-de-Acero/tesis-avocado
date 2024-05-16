@@ -80,6 +80,23 @@ BEGIN
 END
 //
 
+DELIMITER //
+CREATE PROCEDURE "sp_getRecetasFeed"(
+IN categoria INT)
+BEGIN
+IF categoria IS NULL
+	THEN
+	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
+	FROM recetas;
+ELSE 
+SELECT r.idReceta, r.titulo, r.descripcion, r.imagen, r.fechaCreacion, r.fechaActualizacion 
+	   FROM recetas r
+       INNER JOIN recetas_categorias rc
+       ON r.idReceta = rc.idReceta
+       WHERE rc.idCategoria = categoria;
+END IF;
+END
+//
 
 -- Traer toda la info de una receta (vista detallada)
 DELIMITER //
@@ -88,14 +105,14 @@ BEGIN
 	IF EXISTS(SELECT * FROM recetas WHERE idReceta = idRequest)
 		THEN
 			WITH categorias AS (
-			  SELECT JSON_ARRAYAGG(nombre) AS categorias
+			  SELECT JSON_ARRAYAGG(JSON_OBJECT('nombre', c.nombre, 'idCategoria', c.idCategoria)) AS categorias
 			  FROM categorias c
 			  INNER JOIN recetas_categorias rc
 			  ON c.idCategoria = rc.idCategoria
 			  WHERE rc.idReceta = idRequest
 			),
 			pasos AS (
-			  SELECT JSON_ARRAYAGG(JSON_OBJECT('idPaso',p.idPaso, 'descripcion', p.descripcion)) AS pasos
+			  SELECT JSON_ARRAYAGG(p.descripcion) AS pasos
 			  FROM pasos p
 			  INNER JOIN recetas r
 			  ON r.idReceta = p.idReceta
@@ -332,21 +349,6 @@ END
 //
 
 DELIMITER //
-CREATE PROCEDURE "sp_getRecetasFeed"(IN limite INT)
-BEGIN
-IF limite IS NULL
-	THEN
-	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
-	FROM recetas;
-ELSE 
-	SELECT idReceta, titulo, descripcion, imagen, fechaCreacion, fechaActualizacion 
-	FROM recetas
-	LIMIT limite;
-END IF;
-END
-//
-
-DELIMITER //
 CREATE PROCEDURE `sp_getProductos`()
 BEGIN
 SELECT * FROM productos;
@@ -392,7 +394,7 @@ IN emailUser VARCHAR(200)
 BEGIN
 IF (SELECT COUNT(*) FROM usuarios WHERE email = emailUser) > 0
 THEN
-SELECT email, contraseña, 
+SELECT email, contraseña, nombreCompleto, usuario, imagen,
 CASE 
 	WHEN isAdmin = 1 
     THEN TRUE
