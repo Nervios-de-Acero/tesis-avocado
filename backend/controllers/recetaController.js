@@ -232,7 +232,6 @@ controller.getRecetasFeed = (req, res) => {
 controller.agregarReceta = (req, res) => {
     const token = req.headers.authorization;
     const email = funcionesToken.decodeToken(token)
-
     if (!email) {
         funcionesComunes.manejoRespuestas(res, {
             errors: {

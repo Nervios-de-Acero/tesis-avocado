@@ -106,6 +106,37 @@ const funcioneslistItems = {
 
         container.append(nuevoItem);
     },
+    agregarItemManual: (itemDato, tipoElemento) =>{
+
+        //Datos Importantes
+    
+        const container = document.querySelector(`#container${tipoElemento}`);
+
+        //Nuevo Elemento
+        const idNuevoItem = container.querySelectorAll('.item').length;
+    
+        let nuevoItem = document.createElement('div');
+        nuevoItem.classList.add('item');
+        nuevoItem.dataset.itemTipo = tipoElemento;
+        nuevoItem.dataset.itemId = idNuevoItem;
+        
+        nuevoItem.innerHTML = `
+        <div class="itemContenido">${itemDato}</div>
+        <input class="btn btn-sm btn-secondary btnBorrarItem" type="button" value="X">
+        `;
+        
+        //Guardamos los cambios
+        const inputOculto = document.querySelector(`#inputHidden${tipoElemento}`);
+
+        //Se agrega el dato al input oculto
+        let arrayItems = [];
+
+        arrayItems.push(itemDato);
+        
+        inputOculto.value = JSON.stringify(arrayItems);
+
+        container.append(nuevoItem);
+    },
     configurarContenedores: (e) =>{
     
         const contenedoresItems = document.querySelectorAll(`.containerItems`);
@@ -146,9 +177,12 @@ const funcionesPeticiones = {
             const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
+                headers:{
+                    authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imp1YW5AZXhhbXBsZS5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzE1ODE3NjQ1LCJleHAiOjE3MTU4MjEyNDV9.U8QNPkwilMKcxcgg_MtC9vQFCwj_vTdEX4IMLKKYBHA',
+                }
             });
     
-            callback(await response.status);
+            callback(await response);
             
         } catch(error){
     
@@ -157,7 +191,14 @@ const funcionesPeticiones = {
     
         return;
     },
-    getDatos: async (url, parametros = null, callback)=>{
+    getDatos: async (url, callback)=>{
+
+        callback = callback || null;
+
+        if(!callback){
+
+            return;
+        }
 
         try{
 

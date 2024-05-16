@@ -94,9 +94,15 @@ const validacionesSubmit = ()=>{
     return validacion;
 }
 
-const getCategorias = () =>{
+const getCategorias = (categorias) =>{
 
+    const arrayCategorias = categorias.content;
+    arrayCategorias.forEach((categoria) =>{
 
+        let nuevaOption = document.createElement('option');
+        nuevaOption.innerHTML = `<option>${categoria.idCategoria}-${categoria.nombre}</option>`
+        selectCategorias.append(nuevaOption);
+    });
 }
 
 //#endregion
@@ -105,9 +111,63 @@ const getCategorias = () =>{
 
 window.addEventListener('load', (e) =>{
 
-    inputHiddenIngredientes.value = JSON.stringify([]);
-    inputHiddenPasos.value = JSON.stringify([]);
-    inputHiddenCategorias.value = JSON.stringify([]);
+    let url;
+
+    if(datosConfig.modo === 'Agregar'){
+        
+        inputHiddenIngredientes.value = JSON.stringify([]);
+        inputHiddenPasos.value = JSON.stringify([]);
+        inputHiddenCategorias.value = JSON.stringify([]);
+        url = '../../admin/getCategorias'
+    } else{
+
+        url = `../../../admin/getRecetaById?id=${datosConfig.idReceta}`;
+        funcionesPeticiones.getDatos(url, (response) =>{
+
+            const datosReceta = response.content;
+
+            inputTitulo.value = datosReceta.titulo;
+            inputTiempoCoccion.value = datosReceta.tiempoCoccion;
+            inputDificultad.value = datosReceta.dificultad;
+            inputImagen.value = datosReceta.imagen;
+            textareaDescripcion.value = datosReceta.descripcion
+
+            datosReceta.ingredientes.forEach((receta) =>{
+
+                funcioneslistItems.agregarItemManual(receta, 'Ingredientes');
+            });
+
+            datosReceta.pasos.forEach((paso) =>{
+
+                funcioneslistItems.agregarItemManual(paso, 'Pasos');
+            });
+
+            //filtramos
+
+            let categoriasFiltradas = [];
+            datosReceta.categorias.forEach((categoria, index, array) =>{
+                
+                if(categoriasFiltradas.length > 0){
+
+                    if (categoriasFiltradas.some(catFiltrada => catFiltrada.idCategoria === categoria.idCategoria)) {
+                        
+                        return;
+                    }
+                }
+
+                categoriasFiltradas.push(categoria);
+            });
+
+            categoriasFiltradas.forEach((categoria) =>{
+
+                const formatoCategoria = categoria.idCategoria + '-' + categoria.nombre
+
+                funcioneslistItems.agregarItemManual(formatoCategoria, 'Categorias');
+            });
+        });
+
+        url = '../../../admin/getCategorias';
+    }
 
     const containers = document.querySelectorAll('.containerItems');
     containers.forEach((container)=>{
@@ -119,19 +179,9 @@ window.addEventListener('load', (e) =>{
         });
     });
 
-    const url = '../admin/getCategorias'
-    funcionesPeticiones.getDatos(url, null, (response)=>{
+    funcionesPeticiones.getDatos(url, (response)=>{
 
-        const arrayCategorias = response.content;
-        arrayCategorias.forEach((categoria) =>{
-
-
-            let nuevaOption = document.createElement('option');
-            nuevaOption.innerHTML = `<option>${categoria.idCategoria}-${categoria.nombre}</option>`
-            selectCategorias.append(nuevaOption);
-        });
-
-
+        getCategorias(response);
     });
     
     selectCategorias.selectedIndex = -1;
@@ -170,11 +220,51 @@ btnSubmit.addEventListener('click', (e) =>{
     formData.append('pasos', inputHiddenPasos.value);
     formData.append('categorias', inputHiddenCategorias.value);
 
-    const url = '../admin/agregarReceta';
+    if(datosConfig.modo === 'Editar'){
+
+        formData.append('idReceta', datosConfig.idReceta)
+    }
+
+    let url;
+
+    if(datosConfig.modo === 'Agregar'){
+
+        url = '../../admin/agregarReceta';
+    } else if(datosConfig.modo === 'Editar'){
+        
+        url = '../../../admin/modificarReceta';
+    }
 
     funcionesPeticiones.enviarFormulario(url, formData, async (response)=>{
 
-        console.log(await response);
+        switch(response.satus){
+
+            case 200:
+                alert(response.message);
+                
+                if(datosConfig.modo === 'Agregar'){
+
+                    url = '../agregarReceta';
+                } else if(datosConfig.modo === 'Editar'){
+                    
+                    url = '../../modificarReceta';
+                }
+                
+                funcionesPeticiones.getDatos(url)
+                break;
+            case 401:
+                alert(response.message);
+                break;
+            case 409:
+                alert(response);
+                break;
+            case 500:
+                alert(response);
+                break;
+            default:
+                alert(response);
+                break;
+        }
     });
 });
 

@@ -26,9 +26,32 @@ controller.renderizarExampleSubmit = (req, res) => {
     res.render(`exampleSubmit`);
 }
 
-controller.renderCrearReceta = (req, res) => {
+controller.renderCargarReceta = (req, res) => {
 
-    res.render(`crearReceta`);
+    const endpoint = req.path.split('/');
+
+    switch(endpoint[2]){
+
+        case 'agregar': 
+            res.render(`cargarReceta`, {modo: 'Agregar', idReceta: null});
+            break;
+        
+        case 'editar':
+            const idReceta = req.params.idReceta;
+            res.render(`cargarReceta`, {modo: 'Editar', idReceta: idReceta});
+            break;
+
+        default:
+            funcionesComunes.manejoRespuestas(res, {
+                errors:{
+                    message: 'Ruta no existente',
+                },
+                meta:{
+                    status: 404,
+                }
+            })
+    }
+
 }
 //#endregion
 
