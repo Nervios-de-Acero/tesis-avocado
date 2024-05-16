@@ -21,6 +21,13 @@ router.route('/cargarReceta/editar/:idReceta')
 router.route('/crearProducto')
   .get(panelController.renderCrearProducto);
 
+router.route("/listaRecetas")
+.get(panelController.renderListaRecetas);
+
+router.route('/listaProductos')
+.get(panelController.renderListaProductos);
+
+
 //#region endpoints
 
 //#endregion

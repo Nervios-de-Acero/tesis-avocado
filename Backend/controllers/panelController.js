@@ -1,5 +1,6 @@
 const funcionesComunes = require('../utils/funcionesComunes');
 const funcionesToken = require('../utils/token');
+const db = require('../conection')
 
 const controller = {};
 
@@ -51,6 +52,47 @@ controller.renderCargarReceta = (req, res) => {
             })
     }
 
+}
+
+
+controller.renderListaRecetas = (req, res) => {
+    try {
+        db.query('CALL sp_getRecetasAdmin();', (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                data = results[0]
+                console.log(data)
+                res.render('listaRecetas', {data});
+            }
+        });
+    } catch (error) {
+        console.error(error)
+    }
+    
+    }
+
+controller.renderEditarReceta = (req, res) => {
+
+    res.send('Estás en Editar receta');
+}
+
+controller.renderListaProductos = (req, res) => {
+
+    try {
+        db.query('CALL sp_getProductos();', (error, results) => {
+            if (error) {
+                throw new Error(error)
+            } else {
+                data = results[0]
+                console.log(data)
+                res.render('listaProductos', {data});
+            }
+        });
+    } catch (error) {
+        console.error(error)
+    }
+    
 }
 
 controller.renderCrearProducto = (req, res) => {
