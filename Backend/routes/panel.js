@@ -9,11 +9,14 @@ const panelController = require('../controllers/panelController');
 //#endregion
 
 router.route('/example')
-.get(panelController.renderizarExample)
-.post(panelController.renderizarExampleSubmit);
+  .get(panelController.renderizarExample)
+  .post(panelController.renderizarExampleSubmit);
 
 router.route('/crearReceta')
-.get(panelController.renderCrearReceta);
+  .get(panelController.renderCrearReceta);
+
+router.route('/crearProducto')
+  .get(panelController.renderCrearProducto);
 
 //#region endpoints
 
