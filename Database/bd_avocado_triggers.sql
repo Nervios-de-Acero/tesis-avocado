@@ -1,6 +1,12 @@
 /*------ TRIGGERS ------*/
 
 DELIMITER //
+CREATE TRIGGER onUserCreate  BEFORE INSERT ON usuarios
+FOR EACH ROW
+SET NEW.imagen = 'https://res.cloudinary.com/dsinjhipn/image/upload/v1717266017/paltita_de_perfil_wsidka.png';
+//
+
+DELIMITER //
 CREATE TRIGGER onUserDelete BEFORE DELETE ON usuarios
 FOR EACH ROW 
 DELETE FROM recetas WHERE creadoPor = OLD.idUsuario
