@@ -241,34 +241,41 @@ btnSubmit.addEventListener('click', (e) =>{
 
     funcionesPeticiones.enviarFormulario(url, formData, metodo, async (response)=>{
 
-        switch(response.satus){
+        // switch(response.satus){
 
-            case 200:
-                alert(response.message);
+
+        //     case 200:
+
+        //         alert('Receta cargada')
+        //         //alert(response.message);
                 
-                if(datosConfig.modo === 'Agregar'){
+        //         if(datosConfig.modo === 'Agregar'){
 
-                    url = '../agregarReceta';
-                } else if(datosConfig.modo === 'Editar'){
+        //             url = '../agregarReceta';
+        //         } else if(datosConfig.modo === 'Editar'){
                     
-                    url = '../../modificarReceta';
-                }
+        //             url = '../../modificarReceta';
+        //         }
                 
-                funcionesPeticiones.getDatos(url)
-                break;
-            case 401:
-                alert(response.message);
-                break;
-            case 409:
-                alert(response);
-                break;
-            case 500:
-                alert(response);
-                break;
-            default:
-                alert(response);
-                break;
-        }
+        //         funcionesPeticiones.getDatos(url)
+        //         break;
+        //     case 401:
+        //         alert('Receta no cargada')
+        //         //alert(response.message);
+        //         break;
+        //     case 409:
+        //         alert('Receta no cargada')
+        //         //alert(response);
+        //         break;
+        //     case 500:
+        //         alert('Receta no cargada')
+        //         //alert(response);
+        //         break;
+        //     default:
+        //         alert('Receta no cargada')
+        //         //alert(response);
+        //         break;
+        // }
     });
 });
 
